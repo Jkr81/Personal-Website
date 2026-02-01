@@ -133,6 +133,24 @@
       color: var(--primary-light);
       text-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
       letter-spacing: 2px;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .logo-icon {
+      font-size: 1.8rem;
+      animation: logoFloat 3s ease-in-out infinite;
+      filter: drop-shadow(0 0 15px rgba(99, 102, 241, 0.6));
+    }
+
+    @keyframes logoFloat {
+      0%, 100% {
+        transform: translateY(0) rotate(0deg);
+      }
+      50% {
+        transform: translateY(-5px) rotate(5deg);
+      }
     }
 
     .nav-links {
@@ -308,28 +326,35 @@
 
     /* About Section */
     .about-content {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 3rem;
+      display: flex;
+      flex-direction: column;
       align-items: center;
+      gap: 3rem;
+      text-align: center;
     }
 
     /* FIXED AVATAR SIZING */
     .avatar-container {
       position: relative;
       width: 100%;
-      max-width: 350px;
+      max-width: 280px;
       margin: 0 auto;
-      display: flex;
-      align-items: center;
     }
 
     .avatar {
       width: 100%;
       aspect-ratio: 1;
-      border-radius: 20px;
+      border-radius: 50%;
       overflow: hidden;
-      box-shadow: 0 0 30px rgba(99, 102, 241, 0.35);
+      box-shadow: 0 0 40px rgba(99, 102, 241, 0.4);
+      border: 3px solid rgba(99, 102, 241, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .avatar:hover {
+      box-shadow: 0 0 60px rgba(99, 102, 241, 0.6);
+      border-color: rgba(99, 102, 241, 0.5);
+      transform: scale(1.02);
     }
 
     .avatar img {
@@ -341,14 +366,15 @@
 
     .about-text {
       font-family: 'Orbitron', monospace;
-      font-size: 1rem;
-      line-height: 1.7;
+      font-size: 1.05rem;
+      line-height: 1.9;
       color: var(--text-secondary);
       font-weight: 400;
+      max-width: 800px;
     }
 
     .about-text p {
-      margin-bottom: 1.2rem;
+      margin-bottom: 1.5rem;
     }
 
     /* Navigation Resume Button */
@@ -620,6 +646,35 @@
       box-shadow: 0 20px 50px rgba(99, 102, 241, 0.3);
     }
 
+    .project-image {
+      width: 100%;
+      height: 200px;
+      overflow: hidden;
+      position: relative;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.1));
+    }
+
+    .project-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .project-card:hover .project-image img {
+      transform: scale(1.1);
+    }
+
+    .project-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(236, 72, 153, 0.15));
+    }
+
     .project-content {
       padding: 1.5rem;
     }
@@ -856,12 +911,160 @@
       color: var(--accent);
     }
 
+    /* Footer Styles */
+    footer {
+      background: var(--darker-bg);
+      border-top: 1px solid rgba(99, 102, 241, 0.2);
+      padding: 3rem 3rem 2rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 3rem;
+      margin-bottom: 2rem;
+    }
+
+    .footer-brand {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .footer-logo {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--primary-light);
+      text-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+      letter-spacing: 2px;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .footer-logo-icon {
+      font-size: 2rem;
+    }
+
+    .footer-tagline {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      max-width: 350px;
+    }
+
+    .footer-section h4 {
+      font-family: 'Orbitron', monospace;
+      font-size: 1rem;
+      color: var(--primary-light);
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 700;
+    }
+
+    .footer-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+    }
+
+    .footer-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-family: 'Orbitron', monospace;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      display: inline-block;
+    }
+
+    .footer-links a:hover {
+      color: var(--primary-light);
+      transform: translateX(5px);
+    }
+
+    .footer-social {
+      display: flex;
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .social-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid rgba(99, 102, 241, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary-light);
+      text-decoration: none;
+      font-size: 1.2rem;
+      transition: all 0.3s ease;
+    }
+
+    .social-icon:hover {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+    }
+
+    .footer-bottom {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(99, 102, 241, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'Orbitron', monospace;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .back-to-top {
+      color: var(--primary-light);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+      font-weight: 600;
+    }
+
+    .back-to-top:hover {
+      transform: translateY(-3px);
+      color: var(--accent);
+    }
+
+    .back-to-top::before {
+      content: '↑';
+      font-size: 1.2rem;
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
       nav {
         flex-direction: column;
         padding: 1rem;
         gap: 1rem;
+      }
+
+      .logo {
+        font-size: 1.2rem;
+      }
+
+      .logo-icon {
+        font-size: 1.5rem;
       }
 
       .nav-links {
@@ -884,7 +1087,11 @@
       }
 
       .about-content {
-        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .about-text {
+        font-size: 0.95rem;
       }
 
       .section-title {
@@ -914,6 +1121,17 @@
       .experience-item::before {
         left: -1.5rem;
       }
+
+      .footer-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .footer-bottom {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+      }
     }
   </style>
 </head>
@@ -923,7 +1141,10 @@
   <div class="particles" id="particles"></div>
 
   <nav>
-    <div class="logo">JOSH ROCHA</div>
+    <div class="logo">
+      <span class="logo-icon">🎮</span>
+      JOSH ROCHA
+    </div>
     <ul class="nav-links">
       <li><a href="#home">Home</a></li>
       <li><a href="#about">About</a></li>
@@ -950,19 +1171,17 @@
   <section id="about">
     <div class="container">
       <h2 class="section-title">About Me</h2>
-      <div class="arcade-frame">
-        <div class="about-content">
-          <div class="avatar-container">
-            <div class="avatar">
-              <img src="me.jpeg" alt="Josh Rocha">
-            </div>
+      <div class="about-content">
+        <div class="avatar-container">
+          <div class="avatar">
+            <img src="me.jpeg" alt="Josh Rocha">
           </div>
+        </div>
 
-          <div class="about-text">
-            <p>I'm a game and interactive media developer at the University of Miami exploring strong interests in immersive storytelling, virtual reality, and experimental digital experiences.</p>
-            <p>My passion often lies in design, whether through user experience or player agency; my work thrives through systems-based thinking. My work moves between computer games and XR experiences, where I experiment with interaction, space, and storytelling using modern game engines and web-based tools.</p>
-            <p>Outside of interactive work, you'll often find me on set shooting or editing my next short film, or traveling in hopes of seeing one of the Seven Wonders of the world.</p>
-          </div>
+        <div class="about-text">
+          <p>I'm a game and interactive media developer at the University of Miami exploring strong interests in immersive storytelling, virtual reality, and experimental digital experiences.</p>
+          <p>My passion often lies in design, whether through user experience or player agency; my work thrives through systems-based thinking. My work moves between computer games and XR experiences, where I experiment with interaction, space, and storytelling using modern game engines and web-based tools.</p>
+          <p>Outside of interactive work, you'll often find me on set shooting or editing my next short film, or traveling in hopes of seeing one of the Seven Wonders of the world.</p>
         </div>
       </div>
     </div>
@@ -973,6 +1192,9 @@
       <h2 class="section-title">Featured Projects</h2>
       <div class="projects-grid">
         <div class="project-card">
+          <div class="project-image">
+            <img src="black.jpg" alt="">
+          </div>
           <div class="project-content">
             <div class="project-type">2D Game / Class Project</div>
             <h3>Black Friday</h3>
@@ -991,6 +1213,9 @@
         </div>
 
         <div class="project-card">
+          <div class="project-image">
+            <img src="rose.jpg" alt="">
+          </div>
           <div class="project-content">
             <div class="project-type">XR / Class Project</div>
             <h3>Crash Loop</h3>
@@ -1009,6 +1234,9 @@
         </div>
 
         <div class="project-card">
+          <div class="project-image">
+            <img src="centennial.jpg" alt="">
+          </div>
           <div class="project-content">
             <div class="project-type">UX/UI / Class project</div>
             <h3>GreenU Redesign</h3>
@@ -1126,6 +1354,46 @@
       </div>
     </div>
   </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-content">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="footer-logo-icon">🎮</span>
+          JOSH ROCHA
+        </div>
+        <p class="footer-tagline">
+          Game designer and interactive media developer crafting immersive experiences through systems-based thinking and creative storytelling.
+        </p>
+      </div>
+
+      <div class="footer-section">
+        <h4>Quick Links</h4>
+        <ul class="footer-links">
+          <li><a href="#about">About</a></li>
+          <li><a href="#projects">Projects</a></li>
+          <li><a href="#experience">Experience</a></li>
+          <li><a href="#skills">Skills</a></li>
+          <li><a href="#connect">Connect</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-section">
+        <h4>Connect</h4>
+        <div class="footer-social">
+          <a href="mailto:jkr81@miami.edu" class="social-icon" title="Email">📧</a>
+          <a href="https://www.linkedin.com/in/josh-rocha-183940230/" target="_blank" class="social-icon" title="LinkedIn">💼</a>
+          <a href="https://github.com/Jkr81" target="_blank" class="social-icon" title="GitHub">💻</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2026 Josh Rocha. All rights reserved.</p>
+      <a href="#home" class="back-to-top">Back to Top</a>
+    </div>
+  </footer>
 
   <!-- Project Detail Modal -->
   <div id="projectModal" class="modal">
