@@ -136,6 +136,14 @@
       display: flex;
       align-items: center;
       gap: 0.8rem;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .logo:hover {
+      color: var(--accent);
+      text-shadow: 0 0 30px rgba(20, 184, 166, 0.6);
     }
 
     .logo-icon {
@@ -375,6 +383,11 @@
 
     .about-text p {
       margin-bottom: 1.5rem;
+    }
+
+    .about-text strong {
+      color: var(--primary-light);
+      font-weight: 700;
     }
 
     /* Navigation Resume Button */
@@ -622,7 +635,7 @@
     /* Projects Section */
     .projects-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: 2rem;
     }
 
@@ -635,6 +648,9 @@
       transition: all 0.4s ease;
       position: relative;
       animation: fadeIn 1s ease-out;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
     }
 
     .project-card:nth-child(2) { animation-delay: 0.15s; }
@@ -677,6 +693,9 @@
 
     .project-content {
       padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
     }
 
     .project-card h3 {
@@ -700,6 +719,7 @@
       line-height: 1.5;
       margin-bottom: 1.2rem;
       font-size: 0.9rem;
+      flex-grow: 1;
     }
 
     .project-tags {
@@ -730,8 +750,8 @@
     .project-link {
       padding: 0.5rem 1.2rem;
       background: transparent;
-      border: 2px solid var(--primary);
-      color: var(--primary-light);
+      border: 2px solid var(--accent);
+      color: var(--accent);
       text-decoration: none;
       border-radius: 8px;
       font-weight: 600;
@@ -742,20 +762,21 @@
     }
 
     .project-link:hover {
-      background: var(--primary);
-      color: white;
+      background: var(--accent);
+      color: var(--darker-bg);
       transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+      box-shadow: 0 5px 15px rgba(20, 184, 166, 0.4);
     }
 
     .project-link.secondary {
-      border-color: var(--accent);
-      color: var(--accent);
+      border-color: var(--primary);
+      color: var(--primary-light);
     }
 
     .project-link.secondary:hover {
-      background: var(--accent);
-      color: var(--darker-bg);
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
     }
 
     /* Connect Section */
@@ -1141,53 +1162,31 @@
   <div class="particles" id="particles"></div>
 
   <nav>
-    <div class="logo">
+    <a href="#home" class="logo">
       <span class="logo-icon">🎮</span>
       JOSH ROCHA
-    </div>
-    <ul class="nav-links">
-      <li><a href="#home">Home</a></li>
-      <li><a href="#about">About</a></li>
-      <li><a href="#projects">Projects</a></li>
-      <li><a href="#experience">Experience</a></li>
-      <li><a href="#skills">Skills</a></li>
-      <li><a href="#connect">Connect</a></li>
-    </ul>
-    <a href="Joshua_Rocha_Resume school.pdf" class="nav-resume-btn" target="_blank" rel="noopener noreferrer">
-      Resume
     </a>
+    <ul class="nav-links">
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="Joshua_Rocha_Resume school.pdf" target="_blank" rel="noopener noreferrer">Resume ↗</a></li>
+    </ul>
+    <a href="#connect" class="nav-resume-btn">Connect</a>
   </nav>
 
-  <section id="home">
+  
+<section id="home">
     <div class="container">
       <div class="home-content">
         <h1 class="glitch-text">JOSH ROCHA</h1>
-        <p class="subtitle">Crafting Interactive Experiences</p>
-        <a href="#about" class="cta-button">Explore Work</a>
+        <p class="subtitle">Designing Games & Immersive Experiences</p>
+        <a href="#projects" class="cta-button">Explore Work</a>
       </div>
     </div>
   </section>
-
-  <section id="about">
-    <div class="container">
-      <h2 class="section-title">About Me</h2>
-      <div class="about-content">
-        <div class="avatar-container">
-          <div class="avatar">
-            <img src="me.jpeg" alt="Josh Rocha">
-          </div>
-        </div>
-
-        <div class="about-text">
-          <p>I'm a game and immersive media developer at the University of Miami exploring strong interests in interactive storytelling, virtual reality, and experimental digital experiences.</p>
-          <p>My passion often lies in design, whether through user experience or player agency; my work thrives through systems-based thinking. My work moves between computer games and XR experiences, where I experiment with interaction, space, and storytelling using modern game engines and web-based tools.</p>
-          <p>Outside of interactive work, you'll often find me on set shooting or editing my next short film, or traveling in hopes of seeing one of the Seven Wonders of the world.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="projects">
+<section id="projects">
     <div class="container">
       <h2 class="section-title">Featured Projects</h2>
       <div class="projects-grid">
@@ -1196,7 +1195,7 @@
             <img src="black.jpg" alt="">
           </div>
           <div class="project-content">
-            <div class="project-type">2D Game / Class Project</div>
+            <div class="project-type">2D top-Down Game</div>
             <h3>Black Friday</h3>
             <p class="project-description">Our team created Black Friday, a 2D top down stealth experience where players take on the role of an employee at a general store called AEKI and find the keys in order to escape..</p>
             <div class="project-tags">
@@ -1207,7 +1206,7 @@
             </div>
             <div class="project-links">
               <a href="#" class="project-link view-details" data-project="blackfriday">View Details</a>
-              <a href="https://play.unity.com/en/games/86bbb397-c755-404c-bd2c-befdb28053f9/blackfridayplay" target="_blank" rel="noopener noreferrer" class="project-link secondary">Play</a>
+              <a href="https://play.unity.com/en/games/86bbb397-c755-404c-bd2c-befdb28053f9/blackfridayplay" target="_blank" rel="noopener noreferrer" class="project-link secondary">Play ↗</a>
             </div>
           </div>
         </div>
@@ -1217,7 +1216,7 @@
             <img src="rose.jpg" alt="">
           </div>
           <div class="project-content">
-            <div class="project-type">XR / Class Project</div>
+            <div class="project-type">XR Escape Room</div>
             <h3>Crash Loop</h3>
             <p class="project-description"> A narrative escape-room experience where your choices repeat, your path bends, and your memories refuse to stay buried. You survived the crash — you didn't escape it.</p>
             <div class="project-tags">
@@ -1228,7 +1227,7 @@
             </div>
             <div class="project-links">
               <a href="#" class="project-link view-details" data-project="crashloop">View Details</a>
-              <a href="https://www.figma.com/proto/kkYwgb2tUFiNZXlMp75bx6/CrashLoopWebsite?node-id=126-4078&starting-point-node-id=126%3A4078" target="_blank" rel="noopener noreferrer" class="project-link secondary">Website</a>
+              <a href="https://www.figma.com/proto/kkYwgb2tUFiNZXlMp75bx6/CrashLoopWebsite?node-id=126-4078&starting-point-node-id=126%3A4078" target="_blank" rel="noopener noreferrer" class="project-link secondary">Website ↗</a>
             </div>
           </div>
         </div>
@@ -1238,7 +1237,7 @@
             <img src="centennial.jpg" alt="">
           </div>
           <div class="project-content">
-            <div class="project-type">UX/UI / Class project</div>
+            <div class="project-type">UX/UI Redesign</div>
             <h3>GreenU Redesign</h3>
             <p class="project-description">This project focused on developing a new redesign fot the University of Miami's sustainability website and an immersive virtual tour for our new dorms - the Centennial Village.</p>
             <div class="project-tags">
@@ -1248,46 +1247,14 @@
             </div>
             <div class="project-links">
               <a href="#" class="project-link view-details" data-project="mindmaze">View Details</a>
-              <a href="https://www.figma.com/proto/ekQni2CX5H8ctQQHE9jVaB/CIM332-Green?node-id=32-490&starting-point-node-id=32%3A490" target="_blank" rel="noopener noreferrer" class="project-link secondary">Website</a>
+              <a href="https://www.figma.com/proto/ekQni2CX5H8ctQQHE9jVaB/CIM332-Green?node-id=32-490&starting-point-node-id=32%3A490" target="_blank" rel="noopener noreferrer" class="project-link secondary">Website ↗</a>
             </div>
           </div>
         </div>
       </div>
     </div>
   </section>
-
-  <section id="experience">
-    <div class="container">
-      <h2 class="section-title">Experience</h2>
-      <div class="arcade-frame">
-        <div class="experience-list">
-          <div class="experience-item">
-            <h3>Senior Game Designer (Dummy text)
-            </h3>
-            <div class="role">Lead Designer - AAA Studio</div>
-            <div class="period">2021 - Present</div>
-            <p>Leading the design of core gameplay systems for a upcoming open-world RPG. Managed a team of 5 designers, implemented player feedback systems, and designed innovative combat mechanics that increased player retention by 40%.</p>
-          </div>
-
-          <div class="experience-item">
-            <h3>Game Designer (Dummy text)</h3>
-            <div class="role">Gameplay Designer - Indie Studio</div>
-            <div class="period">2019 - 2021</div>
-            <p>Designed and balanced progression systems for a roguelike platformer. Created level designs, enemy behaviors, and power-up mechanics. The game received "Best Indie Game" award at multiple festivals.</p>
-          </div>
-
-          <div class="experience-item">
-            <h3>Interactive Media Student</h3>
-            <div class="role">University of Miami</div>
-            <div class="period">2023 - Present</div>
-            <p>University of Miami student studying Interactive Media with minors in Game Design and Motion Pictures</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="skills">
+<section id="skills">
     <div class="container">
       <h2 class="section-title">Skills</h2>
       <div class="skills-grid">
@@ -1336,8 +1303,55 @@
       </div>
     </div>
   </section>
+<section id="experience">
+    <div class="container">
+      <h2 class="section-title">Experience</h2>
+      <div class="arcade-frame">
+        <div class="experience-list">
+          <div class="experience-item">
+            <h3>Senior Game Designer (Dummy text)
+            </h3>
+            <div class="role">Lead Designer - AAA Studio</div>
+            <div class="period">2021 - Present</div>
+            <p>Leading the design of core gameplay systems for a upcoming open-world RPG. Managed a team of 5 designers, implemented player feedback systems, and designed innovative combat mechanics that increased player retention by 40%.</p>
+          </div>
 
-  <section id="connect">
+          <div class="experience-item">
+            <h3>Game Designer (Dummy text)</h3>
+            <div class="role">Gameplay Designer - Indie Studio</div>
+            <div class="period">2019 - 2021</div>
+            <p>Designed and balanced progression systems for a roguelike platformer. Created level designs, enemy behaviors, and power-up mechanics. The game received "Best Indie Game" award at multiple festivals.</p>
+          </div>
+
+          <div class="experience-item">
+            <h3>Interactive Media Student</h3>
+            <div class="role">University of Miami</div>
+            <div class="period">2023 - Present</div>
+            <p>University of Miami student studying Interactive Media with minors in Game Design and Motion Pictures</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+<section id="about">
+    <div class="container">
+      <h2 class="section-title">About Me</h2>
+      <div class="about-content">
+        <div class="avatar-container">
+          <div class="avatar">
+            <img src="me.jpeg" alt="Josh Rocha">
+          </div>
+        </div>
+
+        <div class="about-text">
+          <p>I'm a <strong>game and immersive media developer</strong> at the University of Miami exploring strong interests in <strong>interactive storytelling</strong>, <strong>virtual reality</strong>, and experimental digital experiences.</p>
+          <p>My passion often lies in <strong>design</strong>, whether through <strong>user experience</strong> or <strong>player agency</strong>; my work thrives through <strong>systems-based thinking</strong>. My work moves between <strong>computer games</strong> and <strong>XR experiences</strong>, where I experiment with interaction, space, and storytelling using modern game engines and web-based tools.</p>
+          <p>Outside of interactive work, you'll often find me on set shooting or editing my next <strong>short film</strong>, or traveling in hopes of seeing one of the Seven Wonders of the world.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+<section id="connect">
     <div class="container">
       <h2 class="section-title">Let's Connect</h2>
 
@@ -1348,9 +1362,9 @@
         </p>
 
         <div class="connect-links">
-          <a href="mailto:jkr81@miami.edu" class="connect-btn">Email</a>
-          <a href="https://www.linkedin.com/in/josh-rocha-183940230/" target="_blank" class="connect-btn secondary">LinkedIn</a>
-          <a href="https://github.com/Jkr81" target="_blank" class="connect-btn">GitHub</a>
+          <a href="/cdn-cgi/l/email-protection#3852534a0009785551595551165d5c4d" class="connect-btn">Email ↗</a>
+          <a href="https://www.linkedin.com/in/josh-rocha-183940230/" target="_blank" class="connect-btn secondary">LinkedIn ↗</a>
+          <a href="https://github.com/Jkr81" target="_blank" class="connect-btn">GitHub ↗</a>
         </div>
       </div>
     </div>
@@ -1372,10 +1386,10 @@
       <div class="footer-section">
         <h4>Quick Links</h4>
         <ul class="footer-links">
-          <li><a href="#about">About</a></li>
           <li><a href="#projects">Projects</a></li>
-          <li><a href="#experience">Experience</a></li>
           <li><a href="#skills">Skills</a></li>
+          <li><a href="#experience">Experience</a></li>
+          <li><a href="#about">About</a></li>
           <li><a href="#connect">Connect</a></li>
         </ul>
       </div>
@@ -1383,7 +1397,7 @@
       <div class="footer-section">
         <h4>Connect</h4>
         <div class="footer-social">
-          <a href="mailto:jkr81@miami.edu" class="social-icon" title="Email">📧</a>
+          <a href="/cdn-cgi/l/email-protection#4a202138727b0a27232b2723642f2e3f" class="social-icon" title="Email">📧</a>
           <a href="https://www.linkedin.com/in/josh-rocha-183940230/" target="_blank" class="social-icon" title="LinkedIn">💼</a>
           <a href="https://github.com/Jkr81" target="_blank" class="social-icon" title="GitHub">💻</a>
         </div>
@@ -1405,7 +1419,7 @@
     </div>
   </div>
 
-  <script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     // Create floating particles and controllers
     const particlesContainer = document.getElementById('particles');
     
