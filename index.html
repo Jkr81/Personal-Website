@@ -70,13 +70,19 @@
       position: absolute;
       width: 2px;
       height: 2px;
-      background: var(--primary-light);
-      box-shadow: 0 0 10px var(--primary-light);
-      animation: float 10s infinite;
+      background: white;
+      border-radius: 50%;
+      box-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+      animation: float 10s infinite, twinkle 3s infinite;
     }
 
     @keyframes float {
       0%, 100% { transform: translate(0, 0); opacity: 0; }
+      50% { opacity: 1; }
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; }
       50% { opacity: 1; }
     }
 
@@ -1362,7 +1368,7 @@
         </p>
 
         <div class="connect-links">
-          <a href="/cdn-cgi/l/email-protection#3852534a0009785551595551165d5c4d" class="connect-btn">Email ↗</a>
+          <a href="/cdn-cgi/l/email-protection#3852394a0009785551595551165d5c4d" class="connect-btn">Email ↗</a>
           <a href="https://www.linkedin.com/in/josh-rocha-183940230/" target="_blank" class="connect-btn secondary">LinkedIn ↗</a>
           <a href="https://github.com/Jkr81" target="_blank" class="connect-btn">GitHub ↗</a>
         </div>
@@ -1426,14 +1432,18 @@
     // Controllers array with different gaming icons
     const controllers = ['🎮', '🕹️', '👾', '🎯', '🎲'];
     
-    // Create regular particles
-    for (let i = 0; i < 20; i++) {
+    // Create regular particles (stars) - INCREASED FROM 20 TO 150
+    for (let i = 0; i < 150; i++) {
       const particle = document.createElement('div');
       particle.className = 'particle';
       particle.style.left = Math.random() * 100 + '%';
       particle.style.top = Math.random() * 100 + '%';
       particle.style.animationDelay = Math.random() * 10 + 's';
       particle.style.animationDuration = (Math.random() * 10 + 5) + 's';
+      // Vary star sizes for more visual interest
+      const size = Math.random() * 2 + 1;
+      particle.style.width = size + 'px';
+      particle.style.height = size + 'px';
       particlesContainer.appendChild(particle);
     }
     
