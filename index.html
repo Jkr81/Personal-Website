@@ -93,7 +93,6 @@
       100% { transform: translate(0,-200px) rotate(360deg); opacity: 0; }
     }
 
-    /* ── FIX 1: Nav now uses the same SVG icon as the case study ── */
     nav {
       position: fixed; top: 0; width: 100%;
       padding: 1.5rem 3rem;
@@ -247,7 +246,6 @@
     .about-box p:last-child { margin-bottom: 0; }
     .about-box strong { color: var(--text-primary); font-weight: 600; }
 
-    /* ── FIX 3: Experience — only real entry kept ── */
     .experience-list {
       display: flex; flex-direction: column; gap: 0;
       position: relative; padding-left: 2rem;
@@ -433,7 +431,6 @@
   <div class="scanlines"></div>
   <div class="particles" id="particles"></div>
 
-  <!-- ── FIX 1: SVG logo matching the case study nav ── -->
   <nav>
     <a href="#home" class="logo">
       <svg class="logo-icon" viewBox="0 0 40 28" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -495,6 +492,7 @@
           </div>
         </div>
 
+        <!-- UPDATED: Crash Loop now links to case study page -->
         <div class="project-card">
           <div class="project-image">
             <img src="rose.jpg" alt="Crash Loop XR experience">
@@ -510,7 +508,7 @@
               <span class="project-tag">Developer</span>
             </div>
             <div class="project-links">
-              <a href="#" class="project-link view-details" data-project="crashloop">View Details</a>
+              <a href="crashloop-case-study.html" class="project-link">Case Study ↗</a>
               <a href="https://www.figma.com/proto/kkYwgb2tUFiNZXlMp75bx6/CrashLoopWebsite?node-id=126-4078&starting-point-node-id=126%3A4078" target="_blank" rel="noopener noreferrer" class="project-link secondary">Website ↗</a>
             </div>
           </div>
@@ -586,6 +584,7 @@
       </div>
     </div>
   </section>
+
   <section id="about">
     <div class="container">
       <h2 class="section-title">About Me</h2>
@@ -645,7 +644,7 @@
         <ul class="footer-links">
           <li><a href="#projects">Projects</a></li>
           <li><a href="#skills">Skills</a></li>
-              <li><a href="#about">About</a></li>
+          <li><a href="#about">About</a></li>
           <li><a href="#connect">Connect</a></li>
         </ul>
       </div>
@@ -664,7 +663,7 @@
     </div>
   </footer>
 
-  <!-- ── FIX 4: Dead blackfriday modal data removed; only active project modals remain ── -->
+  <!-- Modal only used for GreenU now -->
   <div id="projectModal" class="modal">
     <div class="modal-content">
       <span class="modal-close">&times;</span>
@@ -674,7 +673,6 @@
   </div>
 
   <script>
-    // Particles & floating controllers
     const particlesContainer = document.getElementById('particles');
     const svgCtrl = `<svg viewBox="0 0 40 28" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 6C5 6 2 9 2 14C2 20 5 26 9 26C11 26 13 24 15 22H25C27 24 29 26 31 26C35 26 38 20 38 14C38 9 35 6 32 6H8Z" fill="rgba(99,102,241,0.15)" stroke="#818cf8" stroke-width="1.5"/><rect x="10" y="11" width="3" height="8" rx="1" fill="#818cf8"/><rect x="8" y="13" width="7" height="3" rx="1" fill="#818cf8"/><circle cx="28" cy="12" r="2" fill="#ec4899" opacity="0.9"/><circle cx="32" cy="14.5" r="2" fill="#818cf8" opacity="0.9"/><circle cx="28" cy="17" r="2" fill="#5eead4" opacity="0.9"/><circle cx="24" cy="14.5" r="2" fill="#f59e0b" opacity="0.9"/><rect x="18" y="10" width="4" height="1.5" rx="0.75" fill="#475569"/><path d="M8 7C8 7 10 4 14 4H18" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round"/><path d="M32 7C32 7 30 4 26 4H22" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round"/></svg>`;
 
@@ -705,7 +703,6 @@
       particlesContainer.appendChild(controller);
     }
 
-    // Smooth scroll
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       anchor.addEventListener('click', function(e) {
         e.preventDefault();
@@ -714,7 +711,6 @@
       });
     });
 
-    // Scroll reveal
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -731,38 +727,7 @@
       observer.observe(el);
     });
 
-    // ── FIX 4: blackfriday entry removed — only crashloop and mindmaze modals remain ──
     const projectDetails = {
-      crashloop: {
-        title: "Crash Loop",
-        content: `
-          <h3>Overview</h3>
-          <p>Crash Loop is an immersive XR narrative experience that places players in an escape-room scenario. The game explores themes of memory, choice, and consequence as players discover that escaping the physical crash is only the beginning of their journey.</p>
-          <h3>What Does the User Do?</h3>
-          <p>Players work through a series of VR escape room challenges inside a mysterious house. They learn the controls, decode clues, solve puzzles, and explore different rooms to progress. Players interact with objects, search for hidden items, follow hints, and piece together the story as they progress through each room.</p>
-          <h3>The Core Narrative</h3>
-          <p>The story follows a character reliving the aftermath of a tragic drunk driving accident. Each room uncovers the truth about the death of their friend. The library, hallway, and rose-garden all contain clues that slowly reveal what happened. In the final scene, the user discovers a newspaper describing the accident, as well as the crashed car.</p>
-          <h3>My Role</h3>
-          <ul>
-            <li>XR interaction design and implementation</li>
-            <li>Garden scene development</li>
-            <li>Trigger interaction mechanics</li>
-            <li>Voice over implementations across all scenes</li>
-          </ul>
-          <h3>Technical Details</h3>
-          <ul>
-            <li>Developed in Unity with C# for XR platforms</li>
-            <li>Created interactive object system for puzzle elements</li>
-            <li>Designed responsive VR UI that adapts to player choices</li>
-          </ul>
-          <h3>Key Features</h3>
-          <ul>
-            <li>Memory-based puzzle mechanics</li>
-            <li>Immersive VR environment with spatial audio</li>
-            <li>Dynamic environmental changes based on player progression</li>
-          </ul>
-        `
-      },
       mindmaze: {
         title: "GreenU Redesign",
         content: `
