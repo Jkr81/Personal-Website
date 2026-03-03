@@ -95,6 +95,7 @@
     .back-arrow { font-size: 1.1rem; transition: transform 0.3s ease; }
     .back-btn:hover .back-arrow { transform: translateX(-4px); }
 
+    /* CHANGE 4: Removed "· Portfolio" tag from nav logo */
     .nav-logo {
       display: flex;
       align-items: center;
@@ -115,15 +116,6 @@
     @keyframes logoFloat {
       0%, 100% { transform: translateY(0) rotate(0deg); }
       50% { transform: translateY(-5px) rotate(5deg); }
-    }
-
-    .nav-tag {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 0.7rem;
-      font-weight: 500;
-      color: var(--dim);
-      letter-spacing: 1px;
-      text-transform: uppercase;
     }
 
     .hero {
@@ -207,12 +199,18 @@
       z-index: 2;
     }
 
+    /* CHANGE 3: Push hero image down to align with text */
     .intro-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 3rem;
       margin-bottom: 5rem;
-      align-items: start;
+      align-items: center;
+    }
+
+    .intro-grid .img-block {
+      align-self: center;
+      margin-top: 2.5rem;
     }
 
     .section-label {
@@ -302,7 +300,20 @@
     .step-card:hover { border-color: rgba(99,102,241,0.35); transform: translateY(-4px); box-shadow: 0 12px 30px rgba(99,102,241,0.15); }
     .step-card:hover::before { opacity: 1; }
 
-    .step-num { font-family: 'Orbitron', monospace; font-size: 2rem; font-weight: 900; color: rgba(99,102,241,0.2); margin-bottom: 0.8rem; line-height: 1; }
+    /* CHANGE 1: Brighter step numbers */
+    .step-num {
+      font-family: 'Orbitron', monospace;
+      font-size: 2rem;
+      font-weight: 900;
+      margin-bottom: 0.8rem;
+      line-height: 1;
+      background: linear-gradient(135deg, var(--indigo-light), var(--teal-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 8px rgba(99,102,241,0.4));
+    }
+
     .step-card h4 { font-family: 'Orbitron', monospace; font-size: 0.85rem; font-weight: 700; color: var(--indigo-light); margin-bottom: 0.6rem; letter-spacing: 0.5px; text-transform: uppercase; }
     .step-card p { font-size: 0.9rem; line-height: 1.6; color: var(--muted); }
 
@@ -377,25 +388,89 @@
     .video-info h4 { font-family: 'Orbitron', monospace; font-size: 0.9rem; font-weight: 700; color: var(--text); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px; }
     .video-info p { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
 
-    .challenges-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2rem; }
+    /* CHANGE 2: Tighter challenge/solution pairs with arrows */
+    .challenges-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      margin-top: 2rem;
+    }
+
+    /* Each challenge-solution pair is grouped as a row */
+    .challenge-pair {
+      display: contents;
+    }
 
     .challenge-card {
       background: var(--card);
       border: 1px solid rgba(99,102,241,0.15);
-      border-radius: 16px;
-      padding: 2rem;
+      padding: 1.5rem;
       position: relative;
+    }
+
+    /* Left column (problems) */
+    .challenge-card.problem {
+      border-right: none;
+      border-radius: 0;
+    }
+
+    /* Right column (solutions) */
+    .challenge-card.solution {
+      border-left: 1px solid rgba(99,102,241,0.15);
+      border-radius: 0;
+    }
+
+    /* First row */
+    .challenge-pair:first-child .challenge-card.problem {
+      border-top-left-radius: 16px;
+    }
+    .challenge-pair:first-child .challenge-card.solution {
+      border-top-right-radius: 16px;
+    }
+
+    /* Last row */
+    .challenge-pair:last-child .challenge-card.problem {
+      border-bottom-left-radius: 16px;
+    }
+    .challenge-pair:last-child .challenge-card.solution {
+      border-bottom-right-radius: 16px;
+    }
+
+    /* Thin divider between rows */
+    .challenge-pair + .challenge-pair .challenge-card {
+      border-top: 1px solid rgba(99,102,241,0.08);
+    }
+
+    /* Arrow connector between problem and solution */
+    .challenge-card.problem::after {
+      content: '→';
+      position: absolute;
+      right: -14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.1rem;
+      color: var(--indigo-light);
+      z-index: 10;
+      background: var(--bg);
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      border: 1px solid rgba(99,102,241,0.3);
+      font-family: monospace;
     }
 
     .challenge-card .ch-label {
       font-family: 'Orbitron', monospace; font-size: 0.65rem; font-weight: 700;
       letter-spacing: 2px; text-transform: uppercase; padding: 0.3rem 0.7rem;
-      border-radius: 6px; margin-bottom: 1rem; display: inline-block;
+      border-radius: 6px; margin-bottom: 0.8rem; display: inline-block;
     }
 
     .challenge-card.problem .ch-label { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
     .challenge-card.solution .ch-label { background: rgba(20,184,166,0.12); color: var(--teal); border: 1px solid rgba(20,184,166,0.2); }
-    .challenge-card h4 { font-family: 'Orbitron', monospace; font-size: 0.9rem; font-weight: 700; color: var(--text); margin-bottom: 0.8rem; }
+    .challenge-card h4 { font-family: 'Orbitron', monospace; font-size: 0.9rem; font-weight: 700; color: var(--text); margin-bottom: 0.6rem; }
     .challenge-card p { font-size: 0.9rem; line-height: 1.6; color: var(--muted); }
 
     .outcomes-bar {
@@ -463,8 +538,13 @@
       .content { padding: 3rem 1.5rem 5rem; }
       .hero h1 { font-size: 2.8rem; }
       .intro-grid { grid-template-columns: 1fr; }
+      .intro-grid .img-block { margin-top: 0; }
       .mechanics-grid { grid-template-columns: 1fr 1fr; }
       .challenges-grid { grid-template-columns: 1fr; }
+      .challenge-pair { display: block; margin-bottom: 0.5rem; }
+      .challenge-card.problem { border-right: 1px solid rgba(99,102,241,0.15); border-bottom: none; border-radius: 16px 16px 0 0 !important; }
+      .challenge-card.solution { border-radius: 0 0 16px 16px !important; }
+      .challenge-card.problem::after { display: none; }
       .outcomes-bar { grid-template-columns: 1fr 1fr; }
       .divider { margin: 0 1.5rem; }
       .video-grid { grid-template-columns: 1fr; }
@@ -488,6 +568,7 @@
       <span class="back-arrow">←</span>
       Back to Portfolio
     </a>
+    <!-- CHANGE 4: Removed "· Portfolio" tag -->
     <a href="index.html" class="nav-logo" onclick="if(document.referrer) { event.preventDefault(); history.back(); }">
       <svg viewBox="0 0 40 28" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M8 6C5 6 2 9 2 14C2 20 5 26 9 26C11 26 13 24 15 22H25C27 24 29 26 31 26C35 26 38 20 38 14C38 9 35 6 32 6H8Z" fill="rgba(99,102,241,0.15)" stroke="#818cf8" stroke-width="1.5"/>
@@ -502,7 +583,6 @@
         <path d="M32 7C32 7 30 4 26 4H22" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round"/>
       </svg>
       <span class="name">JOSH ROCHA</span>
-      <span class="nav-tag">· Portfolio</span>
     </a>
   </nav>
 
@@ -523,6 +603,7 @@
 
   <div class="content">
 
+    <!-- CHANGE 3: img-block has margin-top to push image down to center with text -->
     <div class="intro-grid fade-up">
       <div>
         <div class="section-label">The Problem</div>
@@ -530,11 +611,9 @@
         <p class="prose">Black Friday started with a focused challenge: <strong>how do you turn everyday consumer chaos into a tense, replayable game system</strong> without relying on puzzles or complex narrative?</p>
         <p class="prose">Our goal was to create stress and urgency purely through <strong>movement, enemy behavior, and time pressure</strong> — making the experience feel overwhelming in a way that mirrors real Black Friday crowds: fast, claustrophobic, and unpredictable.</p>
       </div>
-      <div>
-        <div class="img-block">
-          <div class="img-placeholder">
-            <img src="black.jpg" alt="Black Friday Game Screenshot" onerror="this.parentElement.innerHTML='🎮'">
-          </div>
+      <div class="img-block">
+        <div class="img-placeholder">
+          <img src="black.jpg" alt="Black Friday Game Screenshot" onerror="this.parentElement.innerHTML='🎮'">
         </div>
       </div>
     </div>
@@ -545,6 +624,7 @@
       <p class="prose" style="max-width:800px;">Our target audience is <strong>casual and indie players</strong> who enjoy exploration, puzzle solving, and stealth mechanics. Fans of top-down adventure and roguelike games will find the gameplay familiar yet fresh. Players who appreciate <strong>creative, satirical twists on real-world events</strong> — like turning a Black Friday mall into a high-stakes escape — will be especially drawn in.</p>
     </div>
 
+    <!-- CHANGE 1: Brighter step numbers via gradient text on .step-num -->
     <div class="full-section fade-up">
       <div class="section-label">Design Process</div>
       <h2 class="block-title">How We Built It</h2>
@@ -613,22 +693,29 @@
       </div>
     </div>
 
+    <!-- CHANGE 2: Challenge/solution pairs grouped tightly with arrows -->
     <div class="full-section fade-up">
       <div class="section-label">Challenges & Solutions</div>
       <h2 class="block-title">What We Overcame</h2>
       <div class="challenges-grid">
-        <div class="challenge-card problem"><span class="ch-label">Challenge</span><h4>Team Scheduling</h4><p>With 5 members and different class schedules, coordinating development time was a constant challenge across the semester.</p></div>
-        <div class="challenge-card solution"><span class="ch-label">Solution</span><h4>Async Workflow</h4><p>We maximized in-class work time, used group chats actively, and divided tasks so progress could continue independently.</p></div>
-        <div class="challenge-card problem"><span class="ch-label">Challenge</span><h4>GitHub Merge Conflicts</h4><p>Unity's scene-based structure caused significant merge conflicts and occasional corruption when multiple members worked simultaneously.</p></div>
-        <div class="challenge-card solution"><span class="ch-label">Solution</span><h4>Sequential Scene Work</h4><p>Members avoided simultaneous edits, worked on separate scenes, and maintained strict pull/push protocols with frequent backups.</p></div>
-        <div class="challenge-card problem"><span class="ch-label">Challenge</span><h4>Stealth Balance</h4><p>Making the detection system feel tense but fair was an ongoing design challenge throughout playtesting rounds.</p></div>
-        <div class="challenge-card solution"><span class="ch-label">Solution</span><h4>Visual Feedback System</h4><p>We implemented a visual indicator system so players can clearly understand their detection risk at all times.</p></div>
+        <div class="challenge-pair">
+          <div class="challenge-card problem"><span class="ch-label">Challenge</span><h4>Team Scheduling</h4><p>With 5 members and different class schedules, coordinating development time was a constant challenge across the semester.</p></div>
+          <div class="challenge-card solution"><span class="ch-label">Solution</span><h4>Async Workflow</h4><p>We maximized in-class work time, used group chats actively, and divided tasks so progress could continue independently.</p></div>
+        </div>
+        <div class="challenge-pair">
+          <div class="challenge-card problem"><span class="ch-label">Challenge</span><h4>GitHub Merge Conflicts</h4><p>Unity's scene-based structure caused significant merge conflicts and occasional corruption when multiple members worked simultaneously.</p></div>
+          <div class="challenge-card solution"><span class="ch-label">Solution</span><h4>Sequential Scene Work</h4><p>Members avoided simultaneous edits, worked on separate scenes, and maintained strict pull/push protocols with frequent backups.</p></div>
+        </div>
+        <div class="challenge-pair">
+          <div class="challenge-card problem"><span class="ch-label">Challenge</span><h4>Stealth Balance</h4><p>Making the detection system feel tense but fair was an ongoing design challenge throughout playtesting rounds.</p></div>
+          <div class="challenge-card solution"><span class="ch-label">Solution</span><h4>Visual Feedback System</h4><p>We implemented a visual indicator system so players can clearly understand their detection risk at all times.</p></div>
+        </div>
       </div>
     </div>
 
     <div class="full-section fade-up">
       <div class="section-label">Results</div>
-      <h2 class="block-title">What We Shipped</h2>
+      <h2 class="block-title">What We Delivered</h2>
       <p class="prose" style="max-width:780px; margin-bottom: 0;">The project resulted in a complete, fully playable two-level 2D top-down escape game. Reflecting on development, the game grew from a simple early prototype into a polished and engaging experience shaped extensively by <strong>iterative testing, continuous refinement, and close team collaboration.</strong></p>
       <div class="outcomes-bar">
         <div class="outcome-stat"><div class="num">2</div><div class="desc">Fully playable<br>game levels</div></div>
