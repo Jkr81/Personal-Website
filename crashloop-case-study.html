@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crash Loop — Case Study · Josh Rocha</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 28'><path d='M8 6C5 6 2 9 2 14C2 20 5 26 9 26C11 26 13 24 15 22H25C27 24 29 26 31 26C35 26 38 20 38 14C38 9 35 6 32 6H8Z' fill='%236366f1'/><rect x='10' y='11' width='3' height='8' rx='1' fill='white'/><rect x='8' y='13' width='7' height='3' rx='1' fill='white'/><circle cx='28' cy='12' r='2.2' fill='%23ec4899'/><circle cx='32.5' cy='15' r='2.2' fill='white'/><circle cx='28' cy='18' r='2.2' fill='%2314b8a6'/><circle cx='23.5' cy='15' r='2.2' fill='%23f59e0b'/></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #060810; --surface: #0d1117; --card: rgba(17,24,39,0.8);
+      --indigo: #6366f1; --indigo-light: #818cf8; --pink: #ec4899;
+      --teal: #14b8a6; --teal-light: #5eead4; --red: #dc2626; --red-light: #f87171;
+      --text: #f1f5f9; --muted: #94a3b8; --dim: #475569; --grid: rgba(99,102,241,0.06);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+    .grid-bg { position: fixed; inset: 0; background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 50px 50px; pointer-events: none; z-index: 0; }
+    .scanlines { position: fixed; inset: 0; background: repeating-linear-gradient(to bottom, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px); pointer-events: none; z-index: 0; opacity: 0.4; }
+    .back-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 1.2rem 3rem; background: rgba(6,8,16,0.92); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(99,102,241,0.15); display: flex; align-items: center; justify-content: space-between; }
+    .back-btn { display: flex; align-items: center; gap: 0.7rem; color: var(--muted); text-decoration: none; font-family: 'Orbitron', monospace; font-size: 0.8rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; transition: all 0.3s ease; padding: 0.5rem 1rem; border: 1px solid rgba(99,102,241,0.2); border-radius: 8px; }
+    .back-btn:hover { color: var(--indigo-light); border-color: var(--indigo); background: rgba(99,102,241,0.1); transform: translateX(-3px); }
+    .back-arrow { font-size: 1.1rem; transition: transform 0.3s ease; }
+    .back-btn:hover .back-arrow { transform: translateX(-4px); }
+    .nav-logo { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; color: var(--indigo-light); font-family: 'Orbitron', monospace; font-size: 1rem; font-weight: 900; letter-spacing: 2px; transition: all 0.3s; }
+    .nav-logo:hover { color: var(--teal); }
+    .nav-logo svg { width: 28px; height: 28px; filter: drop-shadow(0 0 8px rgba(99,102,241,0.6)); transition: filter 0.3s; animation: logoFloat 3s ease-in-out infinite; }
+    .nav-logo:hover svg { filter: drop-shadow(0 0 12px rgba(20,184,166,0.7)); }
+    @keyframes logoFloat { 0%,100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-5px) rotate(5deg); } }
+    .hero { position: relative; z-index: 2; padding: 10rem 3rem 5rem; max-width: 1100px; margin: 0 auto; }
+    .hero-tag { display: inline-flex; align-items: center; gap: 0.5rem; font-family: 'Orbitron', monospace; font-size: 0.72rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--red-light); background: rgba(220,38,38,0.07); border: 1px solid rgba(220,38,38,0.25); padding: 0.4rem 1rem; border-radius: 100px; margin-bottom: 2rem; }
+    .hero-tag::before { content: '▸'; }
+    .hero h1 { font-family: 'Orbitron', monospace; font-size: clamp(3rem,7vw,5.5rem); font-weight: 900; line-height: 1; margin-bottom: 1.5rem; background: linear-gradient(135deg, #fff 0%, var(--indigo-light) 50%, var(--pink) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: -0.01em; }
+    .hero-sub { font-size: 1.2rem; font-weight: 300; color: var(--muted); max-width: 620px; line-height: 1.7; margin-bottom: 3rem; }
+    .meta-row { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; }
+    .meta-pill { display: flex; flex-direction: column; gap: 0.2rem; padding: 0.7rem 1.3rem; background: var(--card); border: 1px solid rgba(99,102,241,0.15); border-radius: 12px; backdrop-filter: blur(10px); }
+    .meta-pill .label { font-size: 0.65rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--dim); }
+    .meta-pill .value { font-family: 'Orbitron', monospace; font-size: 0.85rem; font-weight: 700; color: var(--indigo-light); }
+    .divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(220,38,38,0.3), rgba(99,102,241,0.2), transparent); margin: 0 3rem; position: relative; z-index: 2; }
+    .content { max-width: 1100px; margin: 0 auto; padding: 4rem 3rem 8rem; position: relative; z-index: 2; }
+    .intro-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-bottom: 5rem; align-items: center; }
+    .intro-grid .img-block { align-self: center; margin-top: 2.5rem; }
+    .section-label { font-family: 'Orbitron', monospace; font-size: 0.7rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--red-light); margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem; }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(248,113,113,0.3), transparent); max-width: 60px; }
+    h2.block-title { font-family: 'Orbitron', monospace; font-size: 1.8rem; font-weight: 900; color: var(--text); margin-bottom: 1.2rem; line-height: 1.2; }
+    .prose { font-size: 1.05rem; line-height: 1.8; color: var(--muted); font-weight: 400; }
+    .prose strong { color: var(--text); font-weight: 600; }
+    .prose + .prose { margin-top: 1.2rem; }
+    .img-block { position: relative; border-radius: 16px; overflow: hidden; border: 1px solid rgba(99,102,241,0.15); background: var(--card); }
+    .img-block img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .img-placeholder { width: 100%; aspect-ratio: 16/10; display: flex; align-items: center; justify-content: center; font-size: 5rem; background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(236,72,153,0.08)); }
+    .full-section { margin-bottom: 5rem; }
+    .features-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.2rem; margin-top: 2rem; }
+    .feature-card { background: var(--card); border: 1px solid rgba(99,102,241,0.12); border-radius: 16px; padding: 1.4rem; transition: all 0.3s ease; position: relative; overflow: hidden; }
+    .feature-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--indigo), var(--pink)); opacity: 0; transition: opacity 0.3s; }
+    .feature-card:hover { border-color: rgba(99,102,241,0.38); transform: translateY(-4px); box-shadow: 0 12px 30px rgba(99,102,241,0.15); }
+    .feature-card:hover::before { opacity: 1; }
+    .feature-icon { font-size: 1.5rem; margin-bottom: 0.7rem; }
+    .feature-card h4 { font-family: 'Orbitron', monospace; font-size: 0.78rem; font-weight: 700; color: var(--indigo-light); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem; }
+    .feature-card p { font-size: 0.87rem; line-height: 1.5; color: var(--muted); }
+    .process-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 1.5rem; margin-top: 2rem; }
+    .step-card { background: var(--card); border: 1px solid rgba(99,102,241,0.15); border-radius: 16px; padding: 1.8rem; position: relative; overflow: hidden; transition: all 0.3s ease; }
+    .step-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--indigo), var(--pink)); opacity: 0; transition: opacity 0.3s; }
+    .step-card:hover { border-color: rgba(99,102,241,0.35); transform: translateY(-4px); box-shadow: 0 12px 30px rgba(99,102,241,0.15); }
+    .step-card:hover::before { opacity: 1; }
+    .step-num { font-family: 'Orbitron', monospace; font-size: 2rem; font-weight: 900; margin-bottom: 0.8rem; line-height: 1; background: linear-gradient(135deg, var(--indigo-light), var(--teal-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; filter: drop-shadow(0 0 8px rgba(99,102,241,0.4)); }
+    .step-card h4 { font-family: 'Orbitron', monospace; font-size: 0.85rem; font-weight: 700; color: var(--indigo-light); margin-bottom: 0.6rem; letter-spacing: 0.5px; text-transform: uppercase; }
+    .step-card p { font-size: 0.9rem; line-height: 1.6; color: var(--muted); }
+
+    /* ── Room cards ── */
+    .rooms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2rem; }
+    .room-card { background: var(--card); border: 1px solid rgba(99,102,241,0.15); border-radius: 16px; overflow: hidden; transition: all 0.3s ease; }
+    .room-card:hover { border-color: rgba(99,102,241,0.38); box-shadow: 0 12px 40px rgba(99,102,241,0.15); transform: translateY(-4px); }
+    .room-media { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; overflow: hidden; }
+
+    /* video sits at the back, always present */
+    .room-media video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    /* thumbnail sits above video, fades out on hover */
+    .room-media .thumb {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; display: block;
+      z-index: 1;
+      filter: brightness(0.5);
+      transition: opacity 0.4s ease;
+    }
+    .room-card:hover .room-media .thumb { opacity: 0; }
+
+    /* hover hint sits above thumbnail */
+    .hover-hint {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+      display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .hover-hint .hint-icon { font-size: 2rem; filter: drop-shadow(0 0 8px rgba(0,0,0,1)); }
+    .hover-hint .hint-text {
+      font-family: 'Orbitron', monospace; font-size: 0.62rem; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: #fff; text-shadow: 0 0 10px rgba(0,0,0,1), 0 0 4px rgba(0,0,0,1);
+    }
+    .room-card:hover .hover-hint { opacity: 0; }
+
+    /* overlay label always on top */
+    .room-media-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 0.6rem 1rem; background: linear-gradient(transparent, rgba(6,8,16,0.9)); z-index: 3; }
+    .room-media-label { font-family: 'Orbitron', monospace; font-size: 0.7rem; font-weight: 700; color: var(--indigo-light); letter-spacing: 1.5px; text-transform: uppercase; }
+    .room-info { padding: 1rem 1.3rem 1.3rem; }
+    .room-info h4 { font-family: 'Orbitron', monospace; font-size: 0.85rem; font-weight: 700; color: var(--text); margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .room-info p { font-size: 0.87rem; color: var(--muted); line-height: 1.5; }
+
+    .challenges-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-top: 2rem; }
+    .challenge-pair { display: contents; }
+    .challenge-card { background: var(--card); border: 1px solid rgba(99,102,241,0.15); padding: 1.5rem; position: relative; }
+    .challenge-card.problem { border-right: none; }
+    .challenge-card.solution { border-left: 1px solid rgba(99,102,241,0.15); }
+    .challenge-pair:first-child .challenge-card.problem { border-top-left-radius: 16px; }
+    .challenge-pair:first-child .challenge-card.solution { border-top-right-radius: 16px; }
+    .challenge-pair:last-child .challenge-card.problem { border-bottom-left-radius: 16px; }
+    .challenge-pair:last-child .challenge-card.solution { border-bottom-right-radius: 16px; }
+    .challenge-pair + .challenge-pair .challenge-card { border-top: 1px solid rgba(99,102,241,0.08); }
+    .challenge-card.problem::after { content: '→'; position: absolute; right: -14px; top: 50%; transform: translateY(-50%); font-size: 1.1rem; color: var(--indigo-light); z-index: 10; background: var(--bg); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid rgba(99,102,241,0.3); font-family: monospace; }
+    .challenge-card .ch-label { font-family: 'Orbitron', monospace; font-size: 0.65rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 0.3rem 0.7rem; border-radius: 6px; margin-bottom: 0.8rem; display: inline-block; }
+    .challenge-card.problem .ch-label { background: rgba(220,38,38,0.1); color: var(--red-light); border: 1px solid rgba(220,38,38,0.22); }
+    .challenge-card.solution .ch-label { background: rgba(20,184,166,0.12); color: var(--teal); border: 1px solid rgba(20,184,166,0.2); }
+    .challenge-card h4 { font-family: 'Orbitron', monospace; font-size: 0.9rem; font-weight: 700; color: var(--text); margin-bottom: 0.6rem; }
+    .challenge-card p { font-size: 0.9rem; line-height: 1.6; color: var(--muted); }
+    .next-list { display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1.5rem; }
+    .next-item { display: flex; align-items: flex-start; gap: 1rem; padding: 1rem 1.3rem; background: var(--card); border: 1px solid rgba(99,102,241,0.1); border-radius: 10px; transition: all 0.3s ease; }
+    .next-item:hover { border-color: rgba(99,102,241,0.3); transform: translateX(6px); }
+    .next-item .bullet { color: var(--indigo-light); font-family: 'Orbitron', monospace; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; margin-top: 0.1rem; }
+    .next-item p { font-size: 0.95rem; color: var(--muted); line-height: 1.5; }
+    .outcomes-bar { background: var(--card); border: 1px solid rgba(99,102,241,0.15); border-radius: 20px; padding: 2.5rem; margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap: 2rem; }
+    .outcome-stat { text-align: center; }
+    .outcome-stat .num { font-family: 'Orbitron', monospace; font-size: 2.8rem; font-weight: 900; background: linear-gradient(135deg, var(--indigo-light), var(--teal)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; margin-bottom: 0.5rem; }
+    .outcome-stat .desc { font-size: 0.85rem; color: var(--muted); line-height: 1.4; }
+    .cta-block { margin-top: 5rem; text-align: center; padding: 4rem 3rem; background: var(--card); border: 1px solid rgba(99,102,241,0.2); border-radius: 24px; position: relative; overflow: hidden; }
+    .cta-block::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at center, rgba(99,102,241,0.05) 0%, transparent 60%); }
+    .cta-block h3 { font-family: 'Orbitron', monospace; font-size: 1.8rem; font-weight: 900; color: var(--text); margin-bottom: 1rem; position: relative; z-index: 1; }
+    .cta-block p { font-size: 1rem; color: var(--muted); margin-bottom: 2rem; position: relative; z-index: 1; }
+    .cta-btns { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; position: relative; z-index: 1; }
+    .btn-primary { padding: 0.9rem 2.2rem; background: linear-gradient(135deg, var(--indigo), var(--pink)); color: white; text-decoration: none; font-family: 'Orbitron', monospace; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1.5px; border-radius: 100px; transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(99,102,241,0.3); display: inline-flex; align-items: center; gap: 0.6rem; }
+    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(99,102,241,0.5); }
+    .btn-outline { padding: 0.9rem 2.2rem; background: transparent; color: var(--teal); text-decoration: none; font-family: 'Orbitron', monospace; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1.5px; border-radius: 100px; border: 2px solid var(--teal); transition: all 0.3s ease; }
+    .btn-outline:hover { background: var(--teal); color: var(--bg); transform: translateY(-3px); box-shadow: 0 15px 35px rgba(20,184,166,0.3); }
+    @media (max-width: 768px) {
+      .back-nav { padding: 1rem 1.5rem; } .hero { padding: 7rem 1.5rem 3rem; } .content { padding: 3rem 1.5rem 5rem; }
+      .hero h1 { font-size: 2.8rem; } .intro-grid { grid-template-columns: 1fr; } .intro-grid .img-block { margin-top: 0; }
+      .features-grid { grid-template-columns: 1fr 1fr; } .rooms-grid { grid-template-columns: 1fr; }
+      .challenges-grid { grid-template-columns: 1fr; } .challenge-pair { display: block; margin-bottom: 0.5rem; }
+      .challenge-card.problem { border-right: 1px solid rgba(99,102,241,0.15); border-bottom: none; border-radius: 16px 16px 0 0 !important; }
+      .challenge-card.solution { border-radius: 0 0 16px 16px !important; }
+      .challenge-card.problem::after { display: none; } .divider { margin: 0 1.5rem; }
+    }
+    @media (max-width: 480px) { .features-grid { grid-template-columns: 1fr; } }
+    .fade-up { opacity: 0; transform: translateY(30px); transition: all 0.7s cubic-bezier(0.16,1,0.3,1); }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+  <div class="scanlines"></div>
+
+  <nav class="back-nav">
+    <a href="index.html" class="back-btn" onclick="if(document.referrer){event.preventDefault();history.back();}">
+      <span class="back-arrow">←</span> Back to Portfolio
+    </a>
+    <a href="index.html" class="nav-logo" onclick="if(document.referrer){event.preventDefault();history.back();}">
+      <svg viewBox="0 0 40 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 6C5 6 2 9 2 14C2 20 5 26 9 26C11 26 13 24 15 22H25C27 24 29 26 31 26C35 26 38 20 38 14C38 9 35 6 32 6H8Z" fill="rgba(99,102,241,0.15)" stroke="#818cf8" stroke-width="1.5"/>
+        <rect x="10" y="11" width="3" height="8" rx="1" fill="#818cf8"/>
+        <rect x="8" y="13" width="7" height="3" rx="1" fill="#818cf8"/>
+        <circle cx="28" cy="12" r="2" fill="#ec4899" opacity="0.9"/>
+        <circle cx="32" cy="14.5" r="2" fill="#818cf8" opacity="0.9"/>
+        <circle cx="28" cy="17" r="2" fill="#5eead4" opacity="0.9"/>
+        <circle cx="24" cy="14.5" r="2" fill="#f59e0b" opacity="0.9"/>
+        <rect x="18" y="10" width="4" height="1.5" rx="0.75" fill="#475569"/>
+        <path d="M8 7C8 7 10 4 14 4H18" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M32 7C32 7 30 4 26 4H22" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <span class="name">JOSH ROCHA</span>
+    </a>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-tag">Case Study · XR Escape Room</div>
+    <h1>CRASH<br>LOOP</h1>
+    <p class="hero-sub">A VR psychological horror escape room where addiction and regret collide in an endless cycle — forcing you to relive the crash that changed everything.</p>
+    <div class="meta-row">
+      <div class="meta-pill"><span class="label">Engine</span><span class="value">Unity</span></div>
+      <div class="meta-pill"><span class="label">Language</span><span class="value">C#</span></div>
+      <div class="meta-pill"><span class="label">Platform</span><span class="value">Oculus Quest 3</span></div>
+      <div class="meta-pill"><span class="label">Duration</span><span class="value">16 Weeks</span></div>
+      <div class="meta-pill"><span class="label">Team Size</span><span class="value">6 Students</span></div>
+      <div class="meta-pill"><span class="label">My Role</span><span class="value">Designer & Dev</span></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <div class="content">
+
+    <div class="intro-grid fade-up">
+      <div>
+        <div class="section-label">Overview</div>
+        <h2 class="block-title">Every Loop Ends Where It Began</h2>
+        <p class="prose">Trapped inside a mysterious house filled with puzzles, a player navigates a series of challenges — from sorting books to searching a garden of roses — slowly <strong>uncovering the truth of a drunk-driving accident and the death of their friend.</strong></p>
+        <p class="prose">A single-player VR psychological horror experience for the <strong>Oculus Quest 3</strong>. Each failure resets the loop, but knowledge persists — a reflection of the protagonist's inability to accept the past.</p>
+      </div>
+      <div class="img-block">
+        <div class="img-placeholder">
+          <img src="rose.jpg" alt="Crash Loop – Garden Scene" onerror="this.parentElement.innerHTML='🌹'">
+        </div>
+      </div>
+    </div>
+
+    <div class="full-section fade-up">
+      <div class="section-label">Design Intent</div>
+      <h2 class="block-title">More Than Just Puzzles</h2>
+      <p class="prose" style="max-width:800px;">Most escape rooms rely purely on puzzle mechanics with little emotional resonance. Our goal was to give players a <strong>narrative to uncover</strong> — each puzzle tied directly to the story, motivating players through curiosity and emotional connection rather than just task completion. The intent: combine escape room gameplay with a real, meaningful story that lingers after the headset comes off.</p>
+    </div>
+
+    <div class="full-section fade-up">
+      <div class="section-label">Core Features</div>
+      <h2 class="block-title">What Makes It Unique</h2>
+      <div class="features-grid">
+        <div class="feature-card"><div class="feature-icon">🧠</div><h4>Psychological Horror</h4><p>Narrative-based immersion built around real-world issues — mental health and the consequences of drunk driving.</p></div>
+        <div class="feature-card"><div class="feature-icon">📖</div><h4>Rich Backstory</h4><p>Our protagonist and his best friend Jacobe celebrated a win, got drunk, and drove home. He will never forgive himself.</p></div>
+        <div class="feature-card"><div class="feature-icon">🔄</div><h4>Time Loop Mechanic</h4><p>Failure resets the loop but knowledge persists — a metaphor for the protagonist's inability to move on.</p></div>
+        <div class="feature-card"><div class="feature-icon">👁️</div><h4>Environmental Storytelling</h4><p>Every bottle, every rose, every whisper tells part of the story. Each room has its own distinct atmosphere and narrative layer.</p></div>
+        <div class="feature-card"><div class="feature-icon">🎧</div><h4>Spatial Audio</h4><p>3D spatial audio brings the house to life — sound effects and voice-overs are tied directly to player interactions.</p></div>
+        <div class="feature-card"><div class="feature-icon">🎭</div><h4>Twist Ending</h4><p>Break the loop, embrace it, or never learn. Your actions determine not just the ending, but the nature of reality itself.</p></div>
+      </div>
+    </div>
+
+    <div class="full-section fade-up">
+      <div class="section-label">Room Showcase</div>
+      <h2 class="block-title">The Journey Through the House</h2>
+      <p class="prose" style="max-width:800px; margin-bottom:0;">Four rooms, each with its own puzzle and emotional tone — together building toward the truth about Jacobe's death.</p>
+      <div class="rooms-grid">
+
+        <!-- Library — thumbnail: thumb-library.jpg -->
+        <div class="room-card">
+          <div class="room-media">
+            <video src="Libary.mp4" muted loop playsinline preload="none"></video>
+            <img class="thumb" src="libarypic.jpg" alt="Library">
+            <div class="hover-hint">
+              <span class="hint-icon">▶</span>
+              <span class="hint-text">Hover to preview</span>
+            </div>
+            <div class="room-media-overlay"><span class="room-media-label">📚 Scene 01 · Library</span></div>
+          </div>
+          <div class="room-info">
+            <h4>Library</h4>
+            <p>The opening scene. Sort the colored books in the correct order to unlock the door and progress into the house.</p>
+          </div>
+        </div>
+
+        <!-- Hallway — thumbnail: thumb-hallway.jpg -->
+        <div class="room-card">
+          <div class="room-media">
+            <video src="Hallway.mp4" muted loop playsinline preload="none"></video>
+            <img class="thumb" src="Hallwayimg.jpg" alt="Hallway">
+            <div class="hover-hint">
+              <span class="hint-icon">▶</span>
+              <span class="hint-text">Hover to preview</span>
+            </div>
+            <div class="room-media-overlay"><span class="room-media-label">🚪 Scene 02 · Hallway</span></div>
+          </div>
+          <div class="room-info">
+            <h4>Hallway</h4>
+            <p>Find 4 objects placed around the decorated hallway, decode the number sequence they form, and enter the code to advance.</p>
+          </div>
+        </div>
+
+        <!-- Garden — thumbnail: thumb-garden.jpg -->
+        <div class="room-card">
+          <div class="room-media">
+            <video src="Garden.mp4" muted loop playsinline preload="none"></video>
+            <img class="thumb" src="rosepic.jpg" alt="Rose Garden">
+            <div class="hover-hint">
+              <span class="hint-icon">▶</span>
+              <span class="hint-text">Hover to preview</span>
+            </div>
+            <div class="room-media-overlay"><span class="room-media-label">🌹 Scene 03 · Garden</span></div>
+          </div>
+          <div class="room-info">
+            <h4>Rose Garden</h4>
+            <p>An old observatory garden filled with thousands of roses. Find the rusty key hidden among the blooms — a poster gives the clue.</p>
+          </div>
+        </div>
+
+        <!-- Final Scene — thumbnail: thumb-final.jpg -->
+        <div class="room-card">
+          <div class="room-media">
+            <video src="Final Scene.mp4" muted loop playsinline preload="none"></video>
+            <img class="thumb" src="Finalpic.jpg" alt="Final Scene">
+            <div class="hover-hint">
+              <span class="hint-icon">▶</span>
+              <span class="hint-text">Hover to preview</span>
+            </div>
+            <div class="room-media-overlay"><span class="room-media-label">📰 Scene 04 · Final Scene</span></div>
+          </div>
+          <div class="room-info">
+            <h4>Final Scene</h4>
+            <p>Outside the house. Discover the newspaper — all clues converge, the truth is revealed, and the loop closes.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="full-section fade-up">
+      <div class="section-label">Design Process</div>
+      <h2 class="block-title">How We Built It</h2>
+      <div class="process-steps">
+        <div class="step-card"><div class="step-num">01</div><h4>Ideation & GDD</h4><p>Built the concept around psychological horror and social commentary, establishing Jacobe's story as the narrative framework.</p></div>
+        <div class="step-card"><div class="step-num">02</div><h4>Storyboarding</h4><p>Created detailed flow diagrams mapping scene interactions, sound design, and haptic feedback using a three-act structure per room.</p></div>
+        <div class="step-card"><div class="step-num">03</div><h4>Prototyping</h4><p>Built early room prototypes in Unity — testing puzzle timing, lighting, spatial navigation, and object placement before adding narrative assets.</p></div>
+        <div class="step-card"><div class="step-num">04</div><h4>Testing/Iteration</h4><p>Conducted in-headset user testing of the Garden scene. Refined key visibility, trigger zones, voice-over pacing, and rose animation based on feedback.</p></div>
+      </div>
+    </div>
+
+    <div class="full-section fade-up">
+      <div class="section-label">My Contributions</div>
+      <h2 class="block-title">What I Built</h2>
+      <div class="next-list">
+        <div class="next-item"><span class="bullet">▸</span><p><strong style="color:var(--text)">Garden Scene Development</strong> — Designed and built the rose garden room including foliage placement, navigation paths, lighting, and emotional tone.</p></div>
+        <div class="next-item"><span class="bullet">▸</span><p><strong style="color:var(--text)">XR Interaction Design</strong> — Implemented trigger mechanics across scenes including object pick-up, placement detection, and key-lock interactions.</p></div>
+        <div class="next-item"><span class="bullet">▸</span><p><strong style="color:var(--text)">Voice-Over Implementation</strong> — Integrated narration throughout all scenes, aligning audio timing with player movement and puzzle progression.</p></div>
+        <div class="next-item"><span class="bullet">▸</span><p><strong style="color:var(--text)">Spatial Audio Setup</strong> — Configured 3D audio cues in the garden and hallway to build atmosphere and guide player attention.</p></div>
+      </div>
+    </div>
+
+    <div class="full-section fade-up">
+      <div class="section-label">Challenges & Solutions</div>
+      <h2 class="block-title">What We Overcame</h2>
+      <div class="challenges-grid">
+        <div class="challenge-pair">
+          <div class="challenge-card problem"><span class="ch-label">Challenge</span><h4>APK File Size</h4><p>The build grew too large to transfer onto the Quest 3, requiring constant optimization without sacrificing quality.</p></div>
+          <div class="challenge-card solution"><span class="ch-label">Solution</span><h4>Asset Compression</h4><p>Reduced texture sizes, stripped unused assets, and compressed scenes iteratively until the APK reached a deployable size.</p></div>
+        </div>
+        <div class="challenge-pair">
+          <div class="challenge-card problem"><span class="ch-label">Challenge</span><h4>Scene Integration</h4><p>Merging all rooms into one build caused repeated conflicts and transfer failures even after scenes were connected in Unity.</p></div>
+          <div class="challenge-card solution"><span class="ch-label">Solution</span><h4>Sequential Merging</h4><p>Merged scenes one at a time, testing each connection step-by-step with multiple rebuild attempts until the full experience transferred.</p></div>
+        </div>
+        <div class="challenge-pair">
+          <div class="challenge-card problem"><span class="ch-label">Challenge</span><h4>Testing Limitations</h4><p>Deployment issues meant only the Garden scene could be tested in-headset with a small group before final submission.</p></div>
+          <div class="challenge-card solution"><span class="ch-label">Solution</span><h4>Focused Testing</h4><p>Ran structured sessions on the Garden scene, gathering feedback on key visibility, trigger zones, voice-over timing, and rose animation.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="full-section fade-up">
+      <div class="section-label">Results</div>
+      <h2 class="block-title">What We Delivered</h2>
+      <p class="prose" style="max-width:780px; margin-bottom:0;">Despite significant technical hurdles, the team delivered a complete, fully playable multi-room VR escape room — growing from rough prototypes into a <strong>polished, narrative-driven psychological horror experience</strong> built through daily collaboration and a deep commitment to meaningful storytelling.</p>
+      <div class="outcomes-bar">
+        <div class="outcome-stat"><div class="num">4</div><div class="desc">Fully built<br>VR rooms</div></div>
+        <div class="outcome-stat"><div class="num">6</div><div class="desc">Team members<br>collaborating</div></div>
+        <div class="outcome-stat"><div class="num">16</div><div class="desc">Weeks of<br>development</div></div>
+        <div class="outcome-stat"><div class="num">∞</div><div class="desc">The loop<br>never ends</div></div>
+      </div>
+    </div>
+
+    <div class="cta-block fade-up">
+      <h3>Experience the Loop</h3>
+      <p>Download the APK and sideload it onto your Meta Quest headset to play.</p>
+      <div class="cta-btns">
+        <a href="FINAL.apk" class="btn-primary">⬇ Download APK</a>
+        <a href="index.html" class="btn-outline" onclick="if(document.referrer){event.preventDefault();history.back();}">← Back to Portfolio</a>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+    document.querySelectorAll('.room-card').forEach(card => {
+      const vid = card.querySelector('video');
+      if (!vid) return;
+      card.addEventListener('mouseenter', () => { vid.currentTime = 0; vid.play(); });
+      card.addEventListener('mouseleave', () => { vid.pause(); vid.currentTime = 0; });
+    });
+  </script>
+</body>
+</html>
