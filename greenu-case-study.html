@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GreenU Redesign — Case Study · Josh Rocha</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 28'><path d='M8 6C5 6 2 9 2 14C2 20 5 26 9 26C11 26 13 24 15 22H25C27 24 29 26 31 26C35 26 38 20 38 14C38 9 35 6 32 6H8Z' fill='%236366f1'/><rect x='10' y='11' width='3' height='8' rx='1' fill='white'/><rect x='8' y='13' width='7' height='3' rx='1' fill='white'/><circle cx='28' cy='12' r='2.2' fill='%23ec4899'/><circle cx='32.5' cy='15' r='2.2' fill='white'/><circle cx='28' cy='18' r='2.2' fill='%2314b8a6'/><circle cx='23.5' cy='15' r='2.2' fill='%23f59e0b'/></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #060810; --surface: #0d1117; --card: rgba(17,24,39,0.8);
+      --indigo: #6366f1; --indigo-light: #818cf8; --pink: #ec4899;
+      --green: #22c55e; --green-light: #86efac; --green-dark: #16a34a;
+      --teal: #14b8a6; --teal-light: #5eead4;
+      --text: #f1f5f9; --muted: #94a3b8; --dim: #475569; --grid: rgba(99,102,241,0.06);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+    .grid-bg { position: fixed; inset: 0; background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 50px 50px; pointer-events: none; z-index: 0; }
+    .scanlines { position: fixed; inset: 0; background: repeating-linear-gradient(to bottom, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px); pointer-events: none; z-index: 0; opacity: 0.4; }
+
+    .back-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 1.2rem 3rem; background: rgba(6,8,16,0.92); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(99,102,241,0.15); display: flex; align-items: center; justify-content: space-between; }
+    .back-btn { display: flex; align-items: center; gap: 0.7rem; color: var(--muted); text-decoration: none; font-family: 'Orbitron', monospace; font-size: 0.8rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; transition: all 0.3s ease; padding: 0.5rem 1rem; border: 1px solid rgba(99,102,241,0.2); border-radius: 8px; }
+    .back-btn:hover { color: var(--indigo-light); border-color: var(--indigo); background: rgba(99,102,241,0.1); transform: translateX(-3px); }
+    .back-arrow { transition: transform 0.3s ease; }
+    .back-btn:hover .back-arrow { transform: translateX(-4px); }
+    .nav-logo { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; color: var(--indigo-light); font-family: 'Orbitron', monospace; font-size: 1rem; font-weight: 900; letter-spacing: 2px; transition: all 0.3s; }
+    .nav-logo:hover { color: var(--green); }
+    .nav-logo svg { width: 28px; height: 28px; filter: drop-shadow(0 0 8px rgba(99,102,241,0.6)); transition: filter 0.3s; animation: logoFloat 3s ease-in-out infinite; }
+    .nav-logo:hover svg { filter: drop-shadow(0 0 12px rgba(34,197,94,0.7)); }
+    @keyframes logoFloat { 0%,100%{transform:translateY(0) rotate(0deg);} 50%{transform:translateY(-5px) rotate(5deg);} }
+
+    .hero { position: relative; z-index: 2; padding: 10rem 3rem 5rem; max-width: 1100px; margin: 0 auto; }
+    .hero-tag { display: inline-flex; align-items: center; gap: 0.5rem; font-family: 'Orbitron', monospace; font-size: 0.72rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--green); background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.25); padding: 0.4rem 1rem; border-radius: 100px; margin-bottom: 2rem; }
+    .hero-tag::before { content: '▸'; }
+    .hero h1 { font-family: 'Orbitron', monospace; font-size: clamp(2.8rem,6vw,5rem); font-weight: 900; line-height: 1; margin-bottom: 1.5rem; background: linear-gradient(135deg, #fff 0%, var(--green-light) 50%, var(--teal-light) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: -0.01em; }
+    .hero-sub { font-size: 1.2rem; font-weight: 300; color: var(--muted); max-width: 620px; line-height: 1.7; margin-bottom: 3rem; }
+    .meta-row { display: flex; flex-wrap: wrap; gap: 1rem; }
+    .meta-pill { display: flex; flex-direction: column; gap: 0.2rem; padding: 0.7rem 1.3rem; background: var(--card); border: 1px solid rgba(99,102,241,0.15); border-radius: 12px; backdrop-filter: blur(10px); }
+    .meta-pill .label { font-size: 0.65rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--dim); }
+    .meta-pill .value { font-family: 'Orbitron', monospace; font-size: 0.85rem; font-weight: 700; color: var(--green-light); }
+
+    .divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(34,197,94,0.3), rgba(99,102,241,0.2), transparent); margin: 0 3rem; position: relative; z-index: 2; }
+
+    .content { max-width: 1100px; margin: 0 auto; padding: 4rem 3rem 8rem; position: relative; z-index: 2; }
+    .full-section { margin-bottom: 5rem; }
+    .intro-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-bottom: 5rem; align-items: center; }
+    .intro-grid .img-block { align-self: center; margin-top: 2.5rem; }
+
+    .section-label { font-family: 'Orbitron', monospace; font-size: 0.7rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--green); margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem; }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(34,197,94,0.3), transparent); max-width: 60px; }
+    h2.block-title { font-family: 'Orbitron', monospace; font-size: 1.8rem; font-weight: 900; color: var(--text); margin-bottom: 1.2rem; line-height: 1.2; }
+    .prose { font-size: 1.05rem; line-height: 1.8; color: var(--muted); font-weight: 400; }
+    .prose strong { color: var(--text); font-weight: 600; }
+    .prose + .prose { margin-top: 1.2rem; }
+
+    .img-block { position: relative; border-radius: 16px; overflow: hidden; border: 1px solid rgba(34,197,94,0.15); background: var(--card); }
+    .img-block img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .img-placeholder { width: 100%; aspect-ratio: 16/10; display: flex; align-items: center; justify-content: center; font-size: 5rem; background: linear-gradient(135deg, rgba(34,197,94,0.08), rgba(20,184,166,0.08)); }
+
+    .two-col-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-top: 2rem; }
+
+    .issue-card { background: var(--card); border: 1px solid rgba(239,68,68,0.15); border-radius: 14px; padding: 1.4rem; transition: all 0.3s ease; }
+    .issue-card:hover { border-color: rgba(239,68,68,0.35); transform: translateY(-3px); box-shadow: 0 10px 25px rgba(239,68,68,0.1); }
+    .issue-icon { font-size: 1.6rem; margin-bottom: 0.6rem; }
+    .issue-card h4 { font-family: 'Orbitron', monospace; font-size: 0.78rem; font-weight: 700; color: #f87171; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem; }
+    .issue-card p { font-size: 0.88rem; line-height: 1.55; color: var(--muted); }
+
+    .bench-card { background: var(--card); border: 1px solid rgba(99,102,241,0.12); border-radius: 14px; padding: 1.4rem; transition: all 0.3s ease; display: flex; gap: 1rem; align-items: flex-start; }
+    .bench-card:hover { border-color: rgba(34,197,94,0.3); transform: translateY(-3px); }
+    .bench-num { font-family: 'Orbitron', monospace; font-size: 1.5rem; font-weight: 900; background: linear-gradient(135deg, var(--green-light), var(--teal-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; flex-shrink: 0; line-height: 1.1; }
+    .bench-card h4 { font-family: 'Orbitron', monospace; font-size: 0.78rem; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem; }
+    .bench-card p { font-size: 0.87rem; line-height: 1.5; color: var(--muted); }
+
+    .process-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 1.5rem; margin-top: 2rem; }
+    .step-card { background: var(--card); border: 1px solid rgba(99,102,241,0.15); border-radius: 16px; padding: 1.8rem; position: relative; overflow: hidden; transition: all 0.3s ease; }
+    .step-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--green), var(--teal)); opacity: 0; transition: opacity 0.3s; }
+    .step-card:hover { border-color: rgba(34,197,94,0.35); transform: translateY(-4px); box-shadow: 0 12px 30px rgba(34,197,94,0.1); }
+    .step-card:hover::before { opacity: 1; }
+    .step-num { font-family: 'Orbitron', monospace; font-size: 2rem; font-weight: 900; margin-bottom: 0.8rem; line-height: 1; background: linear-gradient(135deg, var(--green-light), var(--teal-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; filter: drop-shadow(0 0 8px rgba(34,197,94,0.3)); }
+    .step-card h4 { font-family: 'Orbitron', monospace; font-size: 0.85rem; font-weight: 700; color: var(--green-light); margin-bottom: 0.6rem; letter-spacing: 0.5px; text-transform: uppercase; }
+    .step-card p { font-size: 0.9rem; line-height: 1.6; color: var(--muted); }
+
+    .recs-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.2rem; margin-top: 2rem; }
+    .rec-card { background: var(--card); border: 1px solid rgba(34,197,94,0.12); border-radius: 14px; padding: 1.5rem; transition: all 0.3s ease; position: relative; overflow: hidden; }
+    .rec-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--green), var(--teal-light)); opacity: 0; transition: opacity 0.3s; }
+    .rec-card:hover { border-color: rgba(34,197,94,0.38); transform: translateY(-4px); box-shadow: 0 12px 30px rgba(34,197,94,0.12); }
+    .rec-card:hover::before { opacity: 1; }
+    .rec-icon { font-size: 1.8rem; margin-bottom: 0.7rem; }
+    .rec-card h4 { font-family: 'Orbitron', monospace; font-size: 0.78rem; font-weight: 700; color: var(--green-light); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem; }
+    .rec-card p { font-size: 0.87rem; line-height: 1.55; color: var(--muted); }
+
+    /* ── Figma embed wrapper ── */
+    .figma-embed-wrap { position: relative; width: 80%; margin: 2rem auto 0; }
+    .figma-embed-wrap iframe { width: 100%; height: 500px; border: none; display: block; border-radius: 12px; }
+    .figma-embed-wrap.tour iframe { height: 600px; }
+    .figma-open-btn { display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 1rem; color: var(--green-light); text-decoration: none; font-family: 'Orbitron', monospace; font-size: 0.68rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 0.4rem 1rem; border: 1px solid rgba(34,197,94,0.3); border-radius: 6px; transition: all 0.3s; }
+    .figma-open-btn:hover { background: rgba(34,197,94,0.1); color: var(--green); }
+
+
+    .next-list { display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1.5rem; }
+    .next-item { display: flex; align-items: flex-start; gap: 1rem; padding: 1rem 1.3rem; background: var(--card); border: 1px solid rgba(99,102,241,0.1); border-radius: 10px; transition: all 0.3s ease; }
+    .next-item:hover { border-color: rgba(34,197,94,0.3); transform: translateX(6px); }
+    .next-item .bullet { color: var(--green-light); font-family: 'Orbitron', monospace; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; margin-top: 0.1rem; }
+    .next-item p { font-size: 0.95rem; color: var(--muted); line-height: 1.5; }
+
+    .challenges-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-top: 2rem; }
+    .challenge-pair { display: contents; }
+    .challenge-card { background: var(--card); border: 1px solid rgba(99,102,241,0.15); padding: 1.5rem; position: relative; }
+    .challenge-card.problem { border-right: none; }
+    .challenge-card.solution { border-left: 1px solid rgba(99,102,241,0.15); }
+    .challenge-pair:first-child .challenge-card.problem { border-top-left-radius: 16px; }
+    .challenge-pair:first-child .challenge-card.solution { border-top-right-radius: 16px; }
+    .challenge-pair:last-child .challenge-card.problem { border-bottom-left-radius: 16px; }
+    .challenge-pair:last-child .challenge-card.solution { border-bottom-right-radius: 16px; }
+    .challenge-pair + .challenge-pair .challenge-card { border-top: 1px solid rgba(99,102,241,0.08); }
+    .challenge-card.problem::after { content: '→'; position: absolute; right: -14px; top: 50%; transform: translateY(-50%); font-size: 1.1rem; color: var(--green-light); z-index: 10; background: var(--bg); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid rgba(34,197,94,0.3); font-family: monospace; }
+    .challenge-card .ch-label { font-family: 'Orbitron', monospace; font-size: 0.65rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 0.3rem 0.7rem; border-radius: 6px; margin-bottom: 0.8rem; display: inline-block; }
+    .challenge-card.problem .ch-label { background: rgba(239,68,68,0.1); color: #f87171; border: 1px solid rgba(239,68,68,0.22); }
+    .challenge-card.solution .ch-label { background: rgba(34,197,94,0.1); color: var(--green-light); border: 1px solid rgba(34,197,94,0.22); }
+    .challenge-card h4 { font-family: 'Orbitron', monospace; font-size: 0.9rem; font-weight: 700; color: var(--text); margin-bottom: 0.6rem; }
+    .challenge-card p { font-size: 0.9rem; line-height: 1.6; color: var(--muted); }
+
+    .outcomes-bar { background: var(--card); border: 1px solid rgba(34,197,94,0.15); border-radius: 20px; padding: 2.5rem; margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap: 2rem; }
+    .outcome-stat { text-align: center; }
+    .outcome-stat .num { font-family: 'Orbitron', monospace; font-size: 2.8rem; font-weight: 900; background: linear-gradient(135deg, var(--green-light), var(--teal)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; margin-bottom: 0.5rem; }
+    .outcome-stat .desc { font-size: 0.85rem; color: var(--muted); line-height: 1.4; }
+
+    .cta-block { margin-top: 5rem; text-align: center; padding: 4rem 3rem; background: var(--card); border: 1px solid rgba(34,197,94,0.2); border-radius: 24px; position: relative; overflow: hidden; }
+    .cta-block::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at center, rgba(34,197,94,0.04) 0%, transparent 60%); }
+    .cta-block h3 { font-family: 'Orbitron', monospace; font-size: 1.8rem; font-weight: 900; color: var(--text); margin-bottom: 1rem; position: relative; z-index: 1; }
+    .cta-block p { font-size: 1rem; color: var(--muted); margin-bottom: 2rem; position: relative; z-index: 1; }
+    .cta-btns { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; position: relative; z-index: 1; }
+    .btn-primary { padding: 0.9rem 2.2rem; background: linear-gradient(135deg, var(--green-dark), var(--teal)); color: white; text-decoration: none; font-family: 'Orbitron', monospace; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1.5px; border-radius: 100px; transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(34,197,94,0.25); }
+    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(34,197,94,0.4); }
+    .btn-outline { padding: 0.9rem 2.2rem; background: transparent; color: var(--green-light); text-decoration: none; font-family: 'Orbitron', monospace; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1.5px; border-radius: 100px; border: 2px solid var(--green-light); transition: all 0.3s ease; }
+    .btn-outline:hover { background: var(--green-light); color: var(--bg); transform: translateY(-3px); box-shadow: 0 15px 35px rgba(34,197,94,0.25); }
+
+    @media (max-width: 768px) {
+      .back-nav { padding: 1rem 1.5rem; } .hero { padding: 7rem 1.5rem 3rem; } .content { padding: 3rem 1.5rem 5rem; }
+      .hero h1 { font-size: 2.5rem; } .intro-grid { grid-template-columns: 1fr; } .intro-grid .img-block { margin-top: 0; }
+      .two-col-grid { grid-template-columns: 1fr; } .recs-grid { grid-template-columns: 1fr 1fr; }
+      .challenges-grid { grid-template-columns: 1fr; } .challenge-pair { display: block; margin-bottom: 0.5rem; }
+      .challenge-card.problem { border-right: 1px solid rgba(99,102,241,0.15); border-bottom: none; border-radius: 16px 16px 0 0 !important; }
+      .challenge-card.solution { border-radius: 0 0 16px 16px !important; }
+      .challenge-card.problem::after { display: none; }
+      .showcase-pair { grid-template-columns: 1fr; } .divider { margin: 0 1.5rem; }
+    }
+    @media (max-width: 480px) { .recs-grid { grid-template-columns: 1fr; } }
+
+    .fade-up { opacity: 0; transform: translateY(30px); transition: all 0.7s cubic-bezier(0.16,1,0.3,1); }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+  <div class="scanlines"></div>
+
+  <nav class="back-nav">
+    <a href="index.html" class="back-btn" onclick="if(document.referrer){event.preventDefault();history.back();}">
+      <span class="back-arrow">←</span> Back to Portfolio
+    </a>
+    <a href="index.html" class="nav-logo" onclick="if(document.referrer){event.preventDefault();history.back();}">
+      <svg viewBox="0 0 40 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 6C5 6 2 9 2 14C2 20 5 26 9 26C11 26 13 24 15 22H25C27 24 29 26 31 26C35 26 38 20 38 14C38 9 35 6 32 6H8Z" fill="rgba(99,102,241,0.15)" stroke="#818cf8" stroke-width="1.5"/>
+        <rect x="10" y="11" width="3" height="8" rx="1" fill="#818cf8"/>
+        <rect x="8" y="13" width="7" height="3" rx="1" fill="#818cf8"/>
+        <circle cx="28" cy="12" r="2" fill="#ec4899" opacity="0.9"/>
+        <circle cx="32" cy="14.5" r="2" fill="#818cf8" opacity="0.9"/>
+        <circle cx="28" cy="17" r="2" fill="#5eead4" opacity="0.9"/>
+        <circle cx="24" cy="14.5" r="2" fill="#f59e0b" opacity="0.9"/>
+        <rect x="18" y="10" width="4" height="1.5" rx="0.75" fill="#475569"/>
+        <path d="M8 7C8 7 10 4 14 4H18" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M32 7C32 7 30 4 26 4H22" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <span>JOSH ROCHA</span>
+    </a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-tag">Case Study · UX/UI Redesign</div>
+    <h1>GREENU<br>REDESIGN</h1>
+    <p class="hero-sub">A full UX/UI overhaul of the University of Miami's sustainability website — plus an immersive virtual tour of the new Centennial Village dorms built in Figma.</p>
+    <div class="meta-row">
+      <div class="meta-pill"><span class="label">Tools</span><span class="value">Figma</span></div>
+      <div class="meta-pill"><span class="label">Type</span><span class="value">UX/UI + Level Design</span></div>
+      <div class="meta-pill"><span class="label">Team Size</span><span class="value">3 Students</span></div>
+      <div class="meta-pill"><span class="label">Client</span><span class="value">Univ. of Miami</span></div>
+      <div class="meta-pill"><span class="label">My Role</span><span class="value">Designer & Prototyper</span></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <div class="content">
+
+    <!-- INTRO -->
+    <div class="intro-grid fade-up">
+      <div>
+        <div class="section-label">The Problem</div>
+        <h2 class="block-title">A Website That Couldn't Communicate Its Own Purpose</h2>
+        <p class="prose">The University of Miami's Green Buildings page exists to <strong>inform and educate readers about LEED certification</strong> and campus sustainability. It struggled to accomplish this due to a complete lack of a consistent design system.</p>
+        <p class="prose">Inconsistent UI elements, varying visual styles across pages, and dysfunctional formatting created an <strong>overwhelming environment</strong> for every intended audience — from students to investors — leading to serious usability and engagement challenges.</p>
+      </div>
+      <div class="img-block">
+        <div class="img-placeholder">
+          <img src="centennial.jpg" alt="GreenU Redesign" onerror="this.parentElement.innerHTML='🌿'">
+        </div>
+      </div>
+    </div>
+
+    <!-- AUDIT -->
+    <div class="full-section fade-up">
+      <div class="section-label">Site Audit</div>
+      <h2 class="block-title">4 Core Issues Discovered</h2>
+      <p class="prose" style="max-width:800px; margin-bottom:0;">After auditing all pages in scope — Green Buildings Overview, Green Building Policy, Building Sustainability Dashboard, Miami Herbert Business School LEED O+M, LEED Certified Buildings, and Phillip & Patricia Frost School of Music — four systemic problems emerged.</p>
+      <div class="two-col-grid">
+        <div class="issue-card"><div class="issue-icon">🎨</div><h4>Inconsistent UI & UX</h4><p>Each building's webpage follows different visual styles and layouts, creating a fragmented experience. Some subheadings are bold, others are not — no unified system exists.</p></div>
+        <div class="issue-card"><div class="issue-icon">🔁</div><h4>Repetitive Content</h4><p>The same information appears across multiple pages, raising navigation concerns and making it harder for users to find what they need.</p></div>
+        <div class="issue-card"><div class="issue-icon">♿</div><h4>Accessibility Concerns</h4><p>The site does not fully adhere to WCAG accessibility guidelines, making it challenging for all users — especially those with disabilities — to access information.</p></div>
+        <div class="issue-card"><div class="issue-icon">📈</div><h4>Scalability Challenges</h4><p>As new LEED-certified buildings are added, the lack of a structured design system creates complications when aggregating new information at scale.</p></div>
+      </div>
+    </div>
+
+    <!-- AUDIENCE -->
+    <div class="full-section fade-up">
+      <div class="section-label">Audience</div>
+      <h2 class="block-title">Who We Designed For</h2>
+      <p class="prose" style="max-width:800px; margin-bottom:0;">The redesign had to serve four distinct audiences simultaneously — each with different needs from the same platform.</p>
+      <div class="two-col-grid">
+        <div class="bench-card"><div class="bench-num">01</div><div><h4>Investors & Sponsors</h4><p>Need clear LEED certification data, sustainability goals, and financial impact metrics.</p></div></div>
+        <div class="bench-card"><div class="bench-num">02</div><div><h4>Faculty & Staff</h4><p>Seeking green policies, initiative guidelines, and participation opportunities.</p></div></div>
+        <div class="bench-card"><div class="bench-num">03</div><div><h4>Current & Prospective Students</h4><p>Want interactive elements, impact visualization, and ways to get actively involved.</p></div></div>
+        <div class="bench-card"><div class="bench-num">04</div><div><h4>Parents of Students</h4><p>Need easy navigation and high-level sustainability highlights without deep technical dives.</p></div></div>
+      </div>
+    </div>
+
+    <!-- BENCHMARK -->
+    <div class="full-section fade-up">
+      <div class="section-label">Benchmark Analysis</div>
+      <h2 class="block-title">Learning From the Best</h2>
+      <p class="prose" style="max-width:800px; margin-bottom:0;">Four competitor universities were analyzed to identify best practices in sustainability web design and extract what made their approaches successful.</p>
+      <div class="two-col-grid">
+        <div class="bench-card"><div class="bench-num">🏫</div><div><h4>Univ. of Michigan</h4><p>Filterable card grid for LEED buildings — intuitive discoverability with multiple link options per project and strong visual hierarchy.</p></div></div>
+        <div class="bench-card"><div class="bench-num">🏛️</div><div><h4>Univ. of Pennsylvania</h4><p>Best overall UX/UI example — minimal nav, ADA-compliant alt text, responsive design, and well-structured interactive tabs.</p></div></div>
+        <div class="bench-card"><div class="bench-num">🔬</div><div><h4>Johns Hopkins</h4><p>Bold header, engaging b-roll video, and a strong CTA to direct users — keeps engagement high immediately on landing.</p></div></div>
+        <div class="bench-card"><div class="bench-num">⚡</div><div><h4>MIT</h4><p>Strong visual hierarchy: bold heading + brief intro + photo-row layout for LEED buildings. Easy to follow despite modest visual design.</p></div></div>
+      </div>
+    </div>
+
+    <!-- PROCESS -->
+    <div class="full-section fade-up">
+      <div class="section-label">Design Process</div>
+      <h2 class="block-title">How We Approached It</h2>
+      <div class="process-steps">
+        <div class="step-card"><div class="step-num">01</div><h4>Scope & Audit</h4><p>Defined the 6 pages in scope and conducted a full site audit to catalog inconsistencies, broken elements, and UX failures across each page.</p></div>
+        <div class="step-card"><div class="step-num">02</div><h4>Audience</h4><p>Mapped the four target audiences to their needs, then researched industry trends: minimalism, earthy palettes, microinteractions, and data visualization.</p></div>
+        <div class="step-card"><div class="step-num">03</div><h4>Benchmark Analysis</h4><p>Analyzed UMich, UPenn, Johns Hopkins, and MIT sustainability pages to extract proven practices in layout, navigation, and accessibility.</p></div>
+        <div class="step-card"><div class="step-num">04</div><h4>Figma Prototyping</h4><p>Built the full redesign in Figma — designing unified nav, content cards, CTA components, and the Centennial Village virtual tour.</p></div>
+      </div>
+    </div>
+
+    <!-- RECOMMENDATIONS -->
+    <div class="full-section fade-up">
+      <div class="section-label">Recommendations</div>
+      <h2 class="block-title">What We Proposed</h2>
+      <div class="recs-grid">
+        <div class="rec-card"><div class="rec-icon">🧩</div><h4>Unified Design System</h4><p>Establish consistent UI elements, typography, and color across all GreenU pages for a cohesive brand experience.</p></div>
+        <div class="rec-card"><div class="rec-icon">🗂️</div><h4>Cards Over Accordions</h4><p>Replace accordion layouts with clickable building cards featuring preview images for faster information discovery.</p></div>
+        <div class="rec-card"><div class="rec-icon">♿</div><h4>WCAG Accessibility</h4><p>Font size controls, high-contrast mode, keyboard navigation, and proper alt text across all pages.</p></div>
+        <div class="rec-card"><div class="rec-icon">📊</div><h4>Interactive Dashboard</h4><p>Make the sustainability dashboard fullscreen-capable with clear data visualization and reduced surrounding clutter.</p></div>
+        <div class="rec-card"><div class="rec-icon">📱</div><h4>Mobile-First Design</h4><p>Ensure all redesigned pages are fully responsive and ADA-compliant across all screen sizes and devices.</p></div>
+        <div class="rec-card"><div class="rec-icon">📐</div><h4>Scalable Templates</h4><p>Standardized page templates so future LEED-certified buildings can be added with minimal design effort.</p></div>
+      </div>
+    </div>
+
+    <!-- ══════════ WEBSITE SHOWCASE ══════════ -->
+    <div class="full-section fade-up">
+      <div class="section-label">Website Showcase</div>
+      <h2 class="block-title">The Redesign, Live in the Browser</h2>
+      <p class="prose" style="max-width:800px; margin-bottom:2rem;">The full Figma prototype brings all redesign recommendations to life — unified navigation, content card layouts, accessible color system, and a cohesive brand identity. Click through it live below, or hit "Open Full" to go fullscreen.</p>
+
+      <div class="figma-embed-wrap">
+        <iframe
+          src="https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Fproto%2FekQni2CX5H8ctQQHE9jVaB%2FCIM332-Green%3Fnode-id%3D32-490%26starting-point-node-id%3D32%3A490%26device=macbook%26scaling%3Dscale-down-width%26content-scaling%3Dfixed&hide-ui=1"
+          allowfullscreen loading="lazy"
+          title="GreenU Website Redesign Prototype">
+        </iframe>
+        <a href="https://www.figma.com/proto/ekQni2CX5H8ctQQHE9jVaB/CIM332-Green?node-id=32-490&starting-point-node-id=32%3A490" target="_blank" rel="noopener noreferrer" class="figma-open-btn">Open Fullscreen ↗</a>
+      </div>
+    </div>
+
+    <!-- ══════════ VIRTUAL TOUR ══════════ -->
+    <div class="full-section fade-up">
+      <div class="section-label">Virtual Tour</div>
+      <h2 class="block-title">Centennial Village — Immersive Walkthrough</h2>
+      <p class="prose" style="max-width:800px; margin-bottom:0;">As part of the redesign, I built an immersive virtual tour of the University of Miami's new Centennial Village dorms in Figma. Click through the embed below to explore it live — or hit "Open Full" to experience it fullscreen.</p>
+
+      <div class="figma-embed-wrap tour">
+        <iframe
+          src="https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Fproto%2FekQni2CX5H8ctQQHE9jVaB%2FCIM332-Green%3Fnode-id%3D494-9274%26t%3DFqONBJknqePLJwIJ-1%26starting-point-node-id%3D494%3A9274%26device=ipad%26scaling%3Dscale-down-width%26content-scaling%3Dfixed&hide-ui=1"
+          allowfullscreen loading="lazy"
+          title="Centennial Village Virtual Tour">
+        </iframe>
+        <a href="https://www.figma.com/proto/ekQni2CX5H8ctQQHE9jVaB/CIM332-Green?node-id=494-9274&t=FqONBJknqePLJwIJ-1&starting-point-node-id=494%3A9274" target="_blank" rel="noopener noreferrer" class="figma-open-btn">Open Fullscreen ↗</a>
+      </div>
+    </div>
+
+    <!-- MY CONTRIBUTIONS -->
+    <div class="full-section fade-up">
+      <div class="section-label">My Contributions</div>
+      <h2 class="block-title">What I Built</h2>
+      <div class="next-list">
+        <div class="next-item"><span class="bullet">▸</span><p><strong style="color:var(--text)">Centennial Village Virtual Tour</strong> — Designed and built the full interactive virtual tour of UM's new dorms in Figma, including navigation flow and spatial layout design.</p></div>
+        <div class="next-item"><span class="bullet">▸</span><p><strong style="color:var(--text)">Figma Prototyping</strong> — Led the majority of prototyping work, building out most of the redesigned pages with interactive links and component states.</p></div>
+        <div class="next-item"><span class="bullet">▸</span><p><strong style="color:var(--text)">Navigation & Content Cards</strong> — Designed the unified navigation system and building card components to replace accordion layouts across all pages.</p></div>
+        <div class="next-item"><span class="bullet">▸</span><p><strong style="color:var(--text)">Accessibility-Compliant Design</strong> — Created design solutions following WCAG guidelines — proper contrast ratios, readable type scales, and keyboard-navigable components.</p></div>
+      </div>
+    </div>
+
+    <!-- CHALLENGES -->
+    <div class="full-section fade-up">
+      <div class="section-label">Challenges & Solutions</div>
+      <h2 class="block-title">What We Overcame</h2>
+      <div class="challenges-grid">
+        <div class="challenge-pair">
+          <div class="challenge-card problem"><span class="ch-label">Challenge</span><h4>No Design System Existed</h4><p>Every page used different fonts, colors, and layouts — there was no shared foundation to build from, making consistency nearly impossible.</p></div>
+          <div class="challenge-card solution"><span class="ch-label">Solution</span><h4>Built One From Scratch</h4><p>We established a unified design system in Figma with reusable components, a defined type scale, and UM-compliant color tokens applied across all pages.</p></div>
+        </div>
+        <div class="challenge-pair">
+          <div class="challenge-card problem"><span class="ch-label">Challenge</span><h4>Information Overload</h4><p>Several pages buried critical content inside accordions, walls of text, or poorly labeled sections — users couldn't find what they needed.</p></div>
+          <div class="challenge-card solution"><span class="ch-label">Solution</span><h4>Content Hierarchy Redesign</h4><p>We restructured content using visual hierarchy principles, content cards, and clear CTAs — surfacing the most important information immediately on page load.</p></div>
+        </div>
+        <div class="challenge-pair">
+          <div class="challenge-card problem"><span class="ch-label">Challenge</span><h4>Serving Four Audiences</h4><p>Investors, faculty, students, and parents all had fundamentally different needs from the same website with no way to filter or personalize their view.</p></div>
+          <div class="challenge-card solution"><span class="ch-label">Solution</span><h4>Universal Clarity</h4><p>Designed for scannability first — bold headers, summary cards, and progressive disclosure let each audience quickly find what's relevant to them.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="full-section fade-up">
+      <div class="section-label">Results</div>
+      <h2 class="block-title">What We Delivered</h2>
+      <p class="prose" style="max-width:780px; margin-bottom:0;">The project delivered a complete, fully interactive Figma prototype of the redesigned GreenU website alongside an immersive virtual tour of Centennial Village — driven by <strong>research, benchmark analysis, and iterative design thinking.</strong></p>
+      <div class="outcomes-bar">
+        <div class="outcome-stat"><div class="num">6</div><div class="desc">Pages fully<br>redesigned</div></div>
+        <div class="outcome-stat"><div class="num">4</div><div class="desc">Competitor<br>benchmarks</div></div>
+        <div class="outcome-stat"><div class="num">4</div><div class="desc">Distinct<br>audiences served</div></div>
+        <div class="outcome-stat"><div class="num">1</div><div class="desc">Immersive<br>virtual tour</div></div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-block fade-up">
+      <h3>Explore the Prototype</h3>
+      <p>The full redesign is live in Figma — click through the interactive prototype yourself.</p>
+      <div class="cta-btns">
+        <a href="https://www.figma.com/proto/ekQni2CX5H8ctQQHE9jVaB/CIM332-Green?node-id=32-490&starting-point-node-id=32%3A490" target="_blank" rel="noopener noreferrer" class="btn-primary">View Prototype ↗</a>
+        <a href="index.html" class="btn-outline" onclick="if(document.referrer){event.preventDefault();history.back();}">← Back to Portfolio</a>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
