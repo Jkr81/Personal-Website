@@ -19,10 +19,10 @@
     .grid-bg { position: fixed; inset: 0; background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 50px 50px; pointer-events: none; z-index: 0; }
     .scanlines { position: fixed; inset: 0; background: repeating-linear-gradient(to bottom, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px); pointer-events: none; z-index: 0; opacity: 0.4; }
 
-    /* ─── FULL NAV ─── */
+    /* ─── NAV (matches index.html) ─── */
     nav {
       position: fixed; top: 0; width: 100%;
-      padding: 1.2rem 3rem;
+      padding: 1.5rem 3rem;
       background: rgba(6,8,16,0.92);
       backdrop-filter: blur(20px);
       border-bottom: 1px solid rgba(99,102,241,0.15);
@@ -30,21 +30,30 @@
       display: flex; justify-content: space-between; align-items: center;
       box-shadow: 0 4px 20px rgba(0,0,0,0.3);
     }
-    .nav-logo { font-family: 'Orbitron', monospace; font-size: 1.1rem; font-weight: 900; color: var(--indigo-light); text-shadow: 0 0 20px rgba(99,102,241,0.5); letter-spacing: 2px; display: flex; align-items: center; gap: 0.7rem; text-decoration: none; transition: all 0.3s ease; }
-    .nav-logo:hover { color: var(--green); text-shadow: 0 0 30px rgba(34,197,94,0.6); }
-    .nav-logo svg { width: 28px; height: 28px; flex-shrink: 0; filter: drop-shadow(0 0 8px rgba(99,102,241,0.6)); transition: filter 0.3s ease; animation: logoFloat 3s ease-in-out infinite; }
-    .nav-logo:hover svg { filter: drop-shadow(0 0 12px rgba(34,197,94,0.7)); }
+    .logo {
+      font-family: 'Orbitron', monospace; font-size: 1.4rem; font-weight: 900;
+      color: var(--indigo-light); text-shadow: 0 0 20px rgba(99,102,241,0.5);
+      letter-spacing: 2px; display: flex; align-items: center; gap: 0.8rem;
+      text-decoration: none; transition: all 0.3s ease;
+    }
+    .logo:hover { color: var(--teal); text-shadow: 0 0 30px rgba(20,184,166,0.6); }
+    .logo-icon { width: 32px; height: 32px; flex-shrink: 0; filter: drop-shadow(0 0 8px rgba(99,102,241,0.6)); transition: filter 0.3s ease; animation: logoFloat 3s ease-in-out infinite; }
+    .logo:hover .logo-icon { filter: drop-shadow(0 0 12px rgba(20,184,166,0.7)); }
     @keyframes logoFloat { 0%,100%{transform:translateY(0) rotate(0deg);} 50%{transform:translateY(-5px) rotate(5deg);} }
-    .nav-links { display: flex; gap: 2rem; list-style: none; align-items: center; }
-    .nav-links a { color: #cbd5e1; text-decoration: none; font-family: 'Orbitron', monospace; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; position: relative; transition: all 0.3s ease; }
+
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; align-items: center; }
+    .nav-links a { color: #cbd5e1; text-decoration: none; font-family: 'Orbitron', monospace; font-weight: 600; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; position: relative; transition: all 0.3s ease; }
     .nav-links a::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px; background: var(--indigo-light); transition: width 0.3s ease; }
     .nav-links a:hover { color: var(--indigo-light); }
     .nav-links a:hover::after { width: 100%; }
-    .nav-links .nav-back { color: var(--muted); border: 1px solid rgba(99,102,241,0.2); padding: 0.4rem 0.9rem; border-radius: 8px; font-size: 0.78rem; }
-    .nav-links .nav-back:hover { color: var(--indigo-light); border-color: var(--indigo); background: rgba(99,102,241,0.1); }
-    .nav-links .nav-back::after { display: none; }
-    .nav-connect-btn { padding: 0.6rem 1.5rem; background: linear-gradient(135deg, var(--indigo), var(--pink)); border: none; color: white; font-family: 'Orbitron', monospace; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 1.5px; text-decoration: none; border-radius: 50px; transition: all 0.3s ease; box-shadow: 0 5px 20px rgba(99,102,241,0.3); }
-    .nav-connect-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(99,102,241,0.5); }
+
+    .nav-resume-btn {
+      padding: 0.7rem 1.8rem; background: linear-gradient(135deg, var(--indigo), var(--pink));
+      border: none; color: white; font-family: 'Orbitron', monospace; font-weight: 700; font-size: 0.9rem;
+      text-transform: uppercase; letter-spacing: 1.5px; text-decoration: none; border-radius: 50px;
+      transition: all 0.3s ease; box-shadow: 0 5px 20px rgba(99,102,241,0.3);
+    }
+    .nav-resume-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(99,102,241,0.5); }
 
     /* Hamburger */
     .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; z-index: 1100; }
@@ -54,7 +63,7 @@
     .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
     .mobile-menu { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(6,8,16,0.98); backdrop-filter: blur(20px); z-index: 999; flex-direction: column; align-items: center; justify-content: center; gap: 2.5rem; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
     .mobile-menu.open { opacity: 1; pointer-events: all; }
-    .mobile-menu a { color: #cbd5e1; text-decoration: none; font-family: 'Orbitron', monospace; font-weight: 700; font-size: 1.3rem; text-transform: uppercase; letter-spacing: 2px; transition: color 0.3s; }
+    .mobile-menu a { color: #cbd5e1; text-decoration: none; font-family: 'Orbitron', monospace; font-weight: 700; font-size: 1.4rem; text-transform: uppercase; letter-spacing: 2px; transition: color 0.3s; }
     .mobile-menu a:hover { color: var(--indigo-light); }
     .mobile-menu .mob-connect { padding: 0.9rem 2.5rem; background: linear-gradient(135deg, var(--indigo), var(--pink)); border-radius: 50px; color: white; font-size: 1rem; }
 
@@ -158,10 +167,9 @@
     .btn-outline { padding: 0.9rem 2.2rem; background: transparent; color: var(--green-light); text-decoration: none; font-family: 'Orbitron', monospace; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1.5px; border-radius: 100px; border: 2px solid var(--green-light); transition: all 0.3s ease; }
     .btn-outline:hover { background: var(--green-light); color: var(--bg); transform: translateY(-3px); box-shadow: 0 15px 35px rgba(34,197,94,0.25); }
 
-    /* ─── RESPONSIVE ─── */
     @media (max-width: 768px) {
       nav { padding: 1rem 1.5rem; }
-      .nav-links, .nav-connect-btn { display: none; }
+      .nav-links, .nav-resume-btn { display: none; }
       .hamburger { display: flex; }
       .mobile-menu { display: flex; }
       .hero { padding: 7rem 1.5rem 3rem; }
@@ -194,16 +202,16 @@
 
   <!-- Mobile menu -->
   <div class="mobile-menu" id="mobileMenu">
-    <a href="index.html" class="mobile-link">← Portfolio</a>
     <a href="index.html#projects" class="mobile-link">Projects</a>
     <a href="index.html#skills" class="mobile-link">Skills</a>
     <a href="index.html#about" class="mobile-link">About</a>
+    <a href="Resume.pdf" target="_blank" rel="noopener noreferrer" class="mobile-link">Resume ↗</a>
     <a href="index.html#connect" class="mob-connect mobile-link">Connect</a>
   </div>
 
   <nav>
-    <a href="index.html" class="nav-logo">
-      <svg viewBox="0 0 40 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <a href="index.html" class="logo">
+      <svg class="logo-icon" viewBox="0 0 40 28" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M8 6C5 6 2 9 2 14C2 20 5 26 9 26C11 26 13 24 15 22H25C27 24 29 26 31 26C35 26 38 20 38 14C38 9 35 6 32 6H8Z" fill="rgba(99,102,241,0.15)" stroke="#818cf8" stroke-width="1.5"/>
         <rect x="10" y="11" width="3" height="8" rx="1" fill="#818cf8"/>
         <rect x="8" y="13" width="7" height="3" rx="1" fill="#818cf8"/>
@@ -218,12 +226,12 @@
       JOSH ROCHA
     </a>
     <ul class="nav-links">
-      <li><a href="index.html" class="nav-back">← Portfolio</a></li>
       <li><a href="index.html#projects">Projects</a></li>
       <li><a href="index.html#skills">Skills</a></li>
       <li><a href="index.html#about">About</a></li>
+      <li><a href="Resume.pdf" target="_blank" rel="noopener noreferrer">Resume ↗</a></li>
     </ul>
-    <a href="index.html#connect" class="nav-connect-btn">Connect</a>
+    <a href="index.html#connect" class="nav-resume-btn">Connect</a>
     <div class="hamburger" id="hamburger">
       <span></span><span></span><span></span>
     </div>
@@ -399,7 +407,6 @@
     }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
     document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 
-    // Hamburger
     const hamburger = document.getElementById('hamburger');
     const mobileMenu = document.getElementById('mobileMenu');
     hamburger.addEventListener('click', () => {
