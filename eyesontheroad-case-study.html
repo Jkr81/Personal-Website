@@ -304,11 +304,7 @@ h2.block-title { font-family: 'Orbitron', monospace; font-size: 1.8rem; font-wei
             <div class="play-icon">
               <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
             </div>
-            <span class="play-hint">Hover to play</span>
-          </div>
-        </div>
-        <div class="gif-info">
-          <div class="gif-label">Mechanic</div>
+            <span class="play-hint" id="hint1">Hover to play</span>
           <h4>Path Drawing</h4>
           <p>Players draw freeform paths on screen in real time, directing pedestrians from sidewalk to sidewalk before traffic arrives.</p>
         </div>
@@ -320,11 +316,7 @@ h2.block-title { font-family: 'Orbitron', monospace; font-size: 1.8rem; font-wei
             <div class="play-icon">
               <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
             </div>
-            <span class="play-hint">Hover to play</span>
-          </div>
-        </div>
-        <div class="gif-info">
-          <div class="gif-label">Consequence</div>
+            <span class="play-hint" id="hint2">Hover to play</span>
           <h4>Collision & Penalty</h4>
           <p>When pedestrians are struck by vehicles, knockback physics and audio feedback make the consequence feel immediate and meaningful.</p>
         </div>
@@ -350,7 +342,7 @@ h2.block-title { font-family: 'Orbitron', monospace; font-size: 1.8rem; font-wei
       <div class="tradeoff-card">
         <h4>Freeform Drawing vs Control</h4>
         <p>Freeform path drawing gives players more agency, but introduced messy paths and unnecessary movement. Constraints like point spacing and directional limits were added to keep input clean.</p>
-        <span class="tradeoff-pill">Expressive — More Complex</span>
+        <span class="tradeoff-pill">More expressive — higher complexity</span>
       </div>
       <div class="tradeoff-card">
         <h4>Sidewalk Zone Locking</h4>
@@ -459,21 +451,41 @@ h2.block-title { font-family: 'Orbitron', monospace; font-size: 1.8rem; font-wei
   }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
   document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 
-  // Hover-to-play video cards
+  // Hover-to-play (desktop) / tap-to-toggle (mobile)
+  const isTouch = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+
+  if (isTouch) {
+    document.querySelectorAll('.play-hint').forEach(h => h.textContent = 'Tap to play');
+  }
+
   [1, 2].forEach(n => {
     const card = document.getElementById('card' + n);
     const vid  = document.getElementById('vid' + n);
     const ov   = document.getElementById('overlay' + n);
     if (!card || !vid || !ov) return;
-    card.addEventListener('mouseenter', () => {
-      vid.play();
-      ov.classList.add('hidden');
-    });
-    card.addEventListener('mouseleave', () => {
-      vid.pause();
-      vid.currentTime = 0;
-      ov.classList.remove('hidden');
-    });
+
+    if (isTouch) {
+      card.addEventListener('click', () => {
+        if (vid.paused) {
+          vid.play();
+          ov.classList.add('hidden');
+        } else {
+          vid.pause();
+          vid.currentTime = 0;
+          ov.classList.remove('hidden');
+        }
+      });
+    } else {
+      card.addEventListener('mouseenter', () => {
+        vid.play();
+        ov.classList.add('hidden');
+      });
+      card.addEventListener('mouseleave', () => {
+        vid.pause();
+        vid.currentTime = 0;
+        ov.classList.remove('hidden');
+      });
+    }
   });
 
   const hamburger = document.getElementById('hamburger');
