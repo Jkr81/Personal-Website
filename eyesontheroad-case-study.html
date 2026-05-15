@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Eyes on the Road — Case Study · Josh Rocha</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 28'><path d='M8 6C5 6 2 9 2 14C2 20 5 26 9 26C11 26 13 24 15 22H25C27 24 29 26 31 26C35 26 38 20 38 14C38 9 35 6 32 6H8Z' fill='%236366f1'/><rect x='10' y='11' width='3' height='8' rx='1' fill='white'/><rect x='8' y='13' width='7' height='3' rx='1' fill='white'/><circle cx='28' cy='12' r='2.2' fill='%23ec4899'/><circle cx='32.5' cy='15' r='2.2' fill='white'/><circle cx='28' cy='18' r='2.2' fill='%2314b8a6'/><circle cx='23.5' cy='15' r='2.2' fill='%23f59e0b'/></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #060810; --surface: #0d1117; --card: rgba(17,24,39,0.8);
+  --indigo: #6366f1; --indigo-light: #818cf8; --pink: #ec4899;
+  --green: #22c55e; --green-light: #86efac; --green-dim: #166534;
+  --amber: #f59e0b; --amber-light: #fcd34d;
+  --teal: #14b8a6; --teal-light: #5eead4;
+  --text: #f1f5f9; --muted: #94a3b8; --dim: #475569; --grid: rgba(34,197,94,0.05);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Space Grotesk', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+.grid-bg { position: fixed; inset: 0; background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 50px 50px; pointer-events: none; z-index: 0; }
+.scanlines { position: fixed; inset: 0; background: repeating-linear-gradient(to bottom, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px); pointer-events: none; z-index: 0; opacity: 0.4; }
+nav { position: fixed; top: 0; width: 100%; padding: 1.5rem 3rem; background: rgba(6,8,16,0.92); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(99,102,241,0.15); z-index: 1000; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+.logo { font-family: 'Orbitron', monospace; font-size: 1.4rem; font-weight: 900; color: var(--indigo-light); text-shadow: 0 0 20px rgba(99,102,241,0.5); letter-spacing: 2px; display: flex; align-items: center; gap: 0.8rem; text-decoration: none; transition: all 0.3s ease; }
+.logo:hover { color: var(--green); text-shadow: 0 0 30px rgba(34,197,94,0.6); }
+.logo-icon { width: 32px; height: 32px; flex-shrink: 0; filter: drop-shadow(0 0 8px rgba(99,102,241,0.6)); transition: filter 0.3s ease; animation: logoFloat 3s ease-in-out infinite; }
+.logo:hover .logo-icon { filter: drop-shadow(0 0 12px rgba(34,197,94,0.7)); }
+@keyframes logoFloat { 0%,100%{transform:translateY(0) rotate(0deg);} 50%{transform:translateY(-5px) rotate(5deg);} }
+.nav-links { display: flex; gap: 2.5rem; list-style: none; align-items: center; }
+.nav-links a { color: #cbd5e1; text-decoration: none; font-family: 'Orbitron', monospace; font-weight: 600; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; position: relative; transition: all 0.3s ease; }
+.nav-links a::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px; background: var(--green-light); transition: width 0.3s ease; }
+.nav-links a:hover { color: var(--green-light); }
+.nav-links a:hover::after { width: 100%; }
+.nav-resume-btn { padding: 0.7rem 1.8rem; background: linear-gradient(135deg, var(--indigo), var(--pink)); border: none; color: white; font-family: 'Orbitron', monospace; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1.5px; text-decoration: none; border-radius: 50px; transition: all 0.3s ease; box-shadow: 0 5px 20px rgba(99,102,241,0.3); }
+.nav-resume-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(99,102,241,0.5); }
+.hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; z-index: 1100; }
+.hamburger span { display: block; width: 24px; height: 2px; background: var(--indigo-light); border-radius: 2px; transition: all 0.3s ease; }
+.hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.mobile-menu { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(6,8,16,0.98); backdrop-filter: blur(20px); z-index: 999; flex-direction: column; align-items: center; justify-content: center; gap: 2.5rem; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+.mobile-menu.open { opacity: 1; pointer-events: all; }
+.mobile-menu a { color: #cbd5e1; text-decoration: none; font-family: 'Orbitron', monospace; font-weight: 700; font-size: 1.4rem; text-transform: uppercase; letter-spacing: 2px; transition: color 0.3s; }
+.mobile-menu a:hover { color: var(--green-light); }
+.mobile-menu .mob-connect { padding: 0.9rem 2.5rem; background: linear-gradient(135deg, var(--indigo), var(--pink)); border-radius: 50px; color: white; font-size: 1rem; }
+.hero { position: relative; z-index: 2; padding: 9rem 3rem 4rem; max-width: 1100px; margin: 0 auto; }
+.hero-tag { display: inline-flex; align-items: center; gap: 0.5rem; font-family: 'Orbitron', monospace; font-size: 0.72rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--green); background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.25); padding: 0.4rem 1rem; border-radius: 100px; margin-bottom: 1.8rem; }
+.hero-tag::before { content: '▸'; }
+.hero h1 { font-family: 'Orbitron', monospace; font-size: clamp(2.4rem,6vw,5rem); font-weight: 900; line-height: 1; margin-bottom: 1.5rem; background: linear-gradient(135deg, #fff 0%, var(--green-light) 50%, var(--amber) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.hero-sub { font-size: 1.2rem; font-weight: 300; color: var(--muted); max-width: 620px; line-height: 1.7; margin-bottom: 2.5rem; }
+.meta-row { display: flex; flex-wrap: wrap; gap: 1rem; }
+.meta-pill { display: flex; flex-direction: column; gap: 0.2rem; padding: 0.7rem 1.3rem; background: var(--card); border: 1px solid rgba(34,197,94,0.15); border-radius: 12px; backdrop-filter: blur(10px); }
+.meta-pill .label { font-size: 0.65rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--dim); }
+.meta-pill .value { font-family: 'Orbitron', monospace; font-size: 0.85rem; font-weight: 700; color: var(--green-light); }
+.divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(34,197,94,0.3), transparent); margin: 0 3rem; position: relative; z-index: 2; }
+.content { max-width: 1100px; margin: 0 auto; padding: 4rem 3rem 7rem; position: relative; z-index: 2; }
+.intro-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-bottom: 4.5rem; align-items: center; }
+.intro-grid .img-block { align-self: center; margin-top: 2.5rem; }
+.full-section { margin-bottom: 4.5rem; }
+.section-label { font-family: 'Orbitron', monospace; font-size: 0.7rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--green); margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem; }
+.section-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(34,197,94,0.3), transparent); max-width: 60px; }
+h2.block-title { font-family: 'Orbitron', monospace; font-size: 1.8rem; font-weight: 900; color: var(--text); margin-bottom: 1.2rem; line-height: 1.2; }
+.prose { font-size: 1.05rem; line-height: 1.8; color: var(--muted); font-weight: 400; }
+.prose strong { color: var(--text); font-weight: 600; }
+.prose + .prose { margin-top: 1.2rem; }
+.img-block { position: relative; border-radius: 16px; overflow: hidden; border: 1px solid rgba(34,197,94,0.15); background: var(--card); }
+.img-block img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.img-placeholder { width: 100%; aspect-ratio: 16/10; display: flex; align-items: center; justify-content: center; font-size: 5rem; background: linear-gradient(135deg, rgba(34,197,94,0.08), rgba(245,158,11,0.08)); }
+.process-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 1.5rem; margin-top: 2rem; }
+.step-card { background: var(--card); border: 1px solid rgba(34,197,94,0.15); border-radius: 16px; padding: 1.8rem; position: relative; overflow: hidden; transition: all 0.3s ease; }
+.step-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--green), var(--amber)); opacity: 0; transition: opacity 0.3s; }
+.step-card:hover { border-color: rgba(34,197,94,0.4); transform: translateY(-4px); box-shadow: 0 12px 30px rgba(34,197,94,0.12); }
+.step-card:hover::before { opacity: 1; }
+.step-num { font-family: 'Orbitron', monospace; font-size: 2rem; font-weight: 900; margin-bottom: 0.8rem; line-height: 1; background: linear-gradient(135deg, var(--green-light), var(--amber-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.step-card h4 { font-family: 'Orbitron', monospace; font-size: 0.85rem; font-weight: 700; color: var(--green-light); margin-bottom: 0.6rem; letter-spacing: 0.5px; text-transform: uppercase; }
+.step-card p { font-size: 0.9rem; line-height: 1.6; color: var(--muted); }
+.mechanics-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 1.2rem; margin-top: 2rem; }
+.mechanic-item { background: var(--card); border: 1px solid rgba(34,197,94,0.12); border-radius: 12px; padding: 1.6rem; display: flex; align-items: center; gap: 1.2rem; transition: all 0.3s ease; }
+.mechanic-item:hover { border-color: rgba(34,197,94,0.35); background: rgba(34,197,94,0.04); }
+.mechanic-icon { font-size: 2rem; flex-shrink: 0; }
+.mechanic-item h5 { font-family: 'Orbitron', monospace; font-size: 0.78rem; font-weight: 700; color: var(--green); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.3rem; }
+.mechanic-item p { font-size: 0.9rem; color: var(--muted); line-height: 1.5; }
+
+/* ── TRADEOFF — equal height, pill pinned to bottom ── */
+.tradeoff-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; margin-top: 2rem; grid-auto-rows: 1fr; }
+.tradeoff-card { background: var(--card); border: 1px solid rgba(34,197,94,0.15); border-radius: 16px; padding: 1.8rem; transition: all 0.3s ease; position: relative; overflow: hidden; display: flex; flex-direction: column; height: 100%; }
+.tradeoff-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--green), var(--amber)); }
+.tradeoff-card:hover { border-color: rgba(34,197,94,0.35); transform: translateY(-3px); box-shadow: 0 10px 25px rgba(34,197,94,0.1); }
+.tradeoff-card h4 { font-family: 'Orbitron', monospace; font-size: 0.85rem; font-weight: 700; color: var(--green-light); margin-bottom: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; }
+.tradeoff-card p { font-size: 0.9rem; color: var(--muted); line-height: 1.6; flex-grow: 1; margin-bottom: 0; }
+.tradeoff-pill { display: inline-flex; align-items: center; gap: 0.4rem; font-family: 'Orbitron', monospace; font-size: 0.6rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 0.35rem 0.8rem; border-radius: 100px; background: rgba(245,158,11,0.1); color: var(--amber); border: 1px solid rgba(245,158,11,0.25); margin-top: 1.2rem; align-self: flex-start; white-space: nowrap; flex-shrink: 0; }
+.tradeoff-pill::before { content: '⚡  '; }
+
+/* ── VIDEO SHOWCASE ── */
+.gif-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem; }
+.gif-card { background: var(--card); border: 1px solid rgba(34,197,94,0.15); border-radius: 20px; overflow: hidden; transition: all 0.3s ease; display: flex; flex-direction: column; }
+.gif-card:hover { border-color: rgba(34,197,94,0.4); box-shadow: 0 12px 40px rgba(34,197,94,0.15); transform: translateY(-4px); }
+.gif-wrapper { width: 100%; aspect-ratio: 16/9; overflow: hidden; position: relative; background: #000; cursor: pointer; }
+.gif-wrapper video { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s ease; }
+.gif-card:hover .gif-wrapper video { transform: scale(1.03); }
+/* Play overlay — shown when paused */
+.play-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.8rem; background: rgba(6,8,16,0.55); backdrop-filter: blur(2px); transition: opacity 0.3s ease; pointer-events: none; }
+.play-overlay .play-icon { width: 52px; height: 52px; border-radius: 50%; border: 2px solid rgba(134,239,172,0.7); background: rgba(34,197,94,0.15); display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; }
+.play-overlay .play-icon svg { width: 20px; height: 20px; fill: var(--green-light); margin-left: 3px; }
+.gif-card:hover .play-overlay .play-icon { border-color: var(--green-light); background: rgba(34,197,94,0.25); transform: scale(1.1); }
+.play-overlay .play-hint { font-family: 'Orbitron', monospace; font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase; color: var(--green-light); opacity: 0.7; }
+.play-overlay.hidden { opacity: 0; }
+.gif-info { padding: 1.3rem 1.5rem 1.5rem; }
+.gif-label { display: inline-flex; align-items: center; gap: 0.4rem; font-family: 'Orbitron', monospace; font-size: 0.65rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--green); margin-bottom: 0.4rem; }
+.gif-label::before { content: '▸'; }
+.gif-info h4 { font-family: 'Orbitron', monospace; font-size: 0.9rem; font-weight: 700; color: var(--text); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px; }
+.gif-info p { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+
+.challenges-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-top: 2rem; }
+.challenge-pair { display: contents; }
+.challenge-card { background: var(--card); border: 1px solid rgba(34,197,94,0.15); padding: 1.5rem; position: relative; }
+.challenge-card.problem { border-right: none; }
+.challenge-card.solution { border-left: 1px solid rgba(34,197,94,0.15); }
+.challenge-pair:first-child .challenge-card.problem { border-top-left-radius: 16px; }
+.challenge-pair:first-child .challenge-card.solution { border-top-right-radius: 16px; }
+.challenge-pair:last-child .challenge-card.problem { border-bottom-left-radius: 16px; }
+.challenge-pair:last-child .challenge-card.solution { border-bottom-right-radius: 16px; }
+.challenge-pair + .challenge-pair .challenge-card { border-top: 1px solid rgba(34,197,94,0.08); }
+.challenge-card.problem::after { content: '→'; position: absolute; right: -14px; top: 50%; transform: translateY(-50%); font-size: 1.1rem; color: var(--green-light); z-index: 10; background: var(--bg); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid rgba(34,197,94,0.3); font-family: monospace; }
+.challenge-card .ch-label { font-family: 'Orbitron', monospace; font-size: 0.65rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 0.3rem 0.7rem; border-radius: 6px; margin-bottom: 0.8rem; display: inline-block; }
+.challenge-card.problem .ch-label { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
+.challenge-card.solution .ch-label { background: rgba(34,197,94,0.12); color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
+.challenge-card h4 { font-family: 'Orbitron', monospace; font-size: 0.9rem; font-weight: 700; color: var(--text); margin-bottom: 0.6rem; }
+.challenge-card p { font-size: 0.9rem; line-height: 1.6; color: var(--muted); }
+.outcomes-bar { background: var(--card); border: 1px solid rgba(34,197,94,0.15); border-radius: 20px; padding: 2.5rem; margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 2rem; }
+.outcome-stat { text-align: center; }
+.outcome-stat .num { font-family: 'Orbitron', monospace; font-size: 2.8rem; font-weight: 900; background: linear-gradient(135deg, var(--green-light), var(--amber)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; margin-bottom: 0.5rem; }
+.outcome-stat .desc { font-size: 0.85rem; color: var(--muted); line-height: 1.4; }
+.next-list { display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1.5rem; }
+.next-item { display: flex; align-items: flex-start; gap: 1rem; padding: 1rem 1.3rem; background: var(--card); border: 1px solid rgba(34,197,94,0.1); border-radius: 10px; transition: all 0.3s ease; }
+.next-item:hover { border-color: rgba(34,197,94,0.3); transform: translateX(6px); }
+.next-item .bullet { color: var(--green-light); font-family: 'Orbitron', monospace; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; margin-top: 0.1rem; }
+.next-item p { font-size: 0.95rem; color: var(--muted); line-height: 1.5; }
+.repo-block { background: var(--card); border: 1px solid rgba(34,197,94,0.2); border-radius: 20px; padding: 2rem 2.5rem; margin-top: 2rem; display: flex; align-items: center; justify-content: space-between; gap: 2rem; flex-wrap: wrap; position: relative; overflow: hidden; transition: all 0.3s ease; }
+.repo-block::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--green), var(--amber), var(--green)); }
+.repo-block:hover { border-color: rgba(34,197,94,0.4); box-shadow: 0 10px 30px rgba(34,197,94,0.12); }
+.repo-info { display: flex; align-items: center; gap: 1.5rem; }
+.repo-icon { font-size: 2.5rem; flex-shrink: 0; }
+.repo-info h4 { font-family: 'Orbitron', monospace; font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 0.3rem; }
+.repo-info p { font-size: 0.9rem; color: var(--muted); line-height: 1.5; max-width: 500px; }
+.repo-btns { display: flex; gap: 1rem; flex-wrap: wrap; flex-shrink: 0; }
+.repo-btn { padding: 0.8rem 1.8rem; background: transparent; border: 2px solid var(--green-light); color: var(--green-light); text-decoration: none; border-radius: 10px; font-family: 'Orbitron', monospace; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s ease; white-space: nowrap; display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
+.repo-btn:hover { background: var(--green); border-color: var(--green); color: var(--bg); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(34,197,94,0.3); }
+.repo-btn.amber { border-color: var(--amber); color: var(--amber); }
+.repo-btn.amber:hover { background: var(--amber); border-color: var(--amber); color: var(--bg); box-shadow: 0 8px 20px rgba(245,158,11,0.3); }
+.reflection-block { background: var(--card); border: 1px solid rgba(34,197,94,0.15); border-radius: 20px; padding: 2.5rem; margin-top: 2rem; position: relative; overflow: hidden; }
+.reflection-block::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--green), var(--amber)); }
+.reflection-block .quote-mark { font-family: 'Orbitron', monospace; font-size: 4rem; font-weight: 900; color: var(--green); opacity: 0.15; line-height: 1; margin-bottom: -1rem; }
+.reflection-block p { font-size: 1.05rem; line-height: 1.85; color: var(--muted); font-weight: 400; }
+.reflection-block p + p { margin-top: 1.2rem; }
+.reflection-block strong { color: var(--text); font-weight: 600; }
+.cta-block { margin-top: 4.5rem; text-align: center; padding: 4rem 3rem; background: var(--card); border: 1px solid rgba(34,197,94,0.2); border-radius: 24px; position: relative; overflow: hidden; }
+.cta-block::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at center, rgba(34,197,94,0.05) 0%, transparent 60%); }
+.cta-block h3 { font-family: 'Orbitron', monospace; font-size: 1.8rem; font-weight: 900; color: var(--text); margin-bottom: 1rem; position: relative; z-index: 1; }
+.cta-block p { font-size: 1rem; color: var(--muted); margin-bottom: 2rem; position: relative; z-index: 1; }
+.cta-btns { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; position: relative; z-index: 1; }
+.btn-primary { padding: 0.9rem 2.2rem; background: linear-gradient(135deg, var(--green), var(--amber)); color: var(--bg); text-decoration: none; font-family: 'Orbitron', monospace; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1.5px; border-radius: 100px; transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(34,197,94,0.3); }
+.btn-primary:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(34,197,94,0.5); }
+.btn-outline { padding: 0.9rem 2.2rem; background: transparent; color: var(--green-light); text-decoration: none; font-family: 'Orbitron', monospace; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1.5px; border-radius: 100px; border: 2px solid var(--green-light); transition: all 0.3s ease; }
+.btn-outline:hover { background: var(--green); border-color: var(--green); color: var(--bg); transform: translateY(-3px); box-shadow: 0 15px 35px rgba(34,197,94,0.3); }
+.fade-up { opacity: 0; transform: translateY(30px); transition: all 0.7s cubic-bezier(0.16,1,0.3,1); }
+.fade-up.visible { opacity: 1; transform: translateY(0); }
+@media (max-width: 900px) { .tradeoff-grid { grid-template-columns: 1fr; } }
+@media (max-width: 768px) {
+  nav { padding: 1rem 1.5rem; }
+  .nav-links, .nav-resume-btn { display: none; }
+  .hamburger { display: flex; }
+  .mobile-menu { display: flex; }
+  .hero { padding: 7rem 1.5rem 3rem; }
+  .content { padding: 3rem 1.5rem 5rem; }
+  .hero h1 { font-size: 2.4rem; }
+  .intro-grid { grid-template-columns: 1fr; }
+  .intro-grid .img-block { margin-top: 0; }
+  .mechanics-grid { grid-template-columns: 1fr; }
+  .challenges-grid { grid-template-columns: 1fr; }
+  .challenge-pair { display: block; margin-bottom: 0.5rem; }
+  .challenge-card.problem { border-right: 1px solid rgba(34,197,94,0.15); border-bottom: none; border-radius: 16px 16px 0 0 !important; }
+  .challenge-card.solution { border-radius: 0 0 16px 16px !important; }
+  .challenge-card.problem::after { display: none; }
+  .outcomes-bar { grid-template-columns: 1fr 1fr; }
+  .divider { margin: 0 1.5rem; }
+  .repo-block { flex-direction: column; align-items: flex-start; }
+  .repo-btns { width: 100%; }
+  .repo-btn { flex: 1; justify-content: center; }
+  .gif-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .mechanics-grid { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 1.9rem; }
+  .process-steps { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="scanlines"></div>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html#projects" class="mobile-link">Projects</a>
+  <a href="index.html#skills" class="mobile-link">Skills</a>
+  <a href="index.html#about" class="mobile-link">About</a>
+  <a href="Resume.pdf" target="_blank" rel="noopener noreferrer" class="mobile-link">Resume ↗</a>
+  <a href="index.html#connect" class="mob-connect mobile-link">Connect</a>
+</div>
+<nav>
+  <a href="index.html" class="logo">
+    <svg class="logo-icon" viewBox="0 0 40 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8 6C5 6 2 9 2 14C2 20 5 26 9 26C11 26 13 24 15 22H25C27 24 29 26 31 26C35 26 38 20 38 14C38 9 35 6 32 6H8Z" fill="rgba(99,102,241,0.15)" stroke="#818cf8" stroke-width="1.5"/>
+      <rect x="10" y="11" width="3" height="8" rx="1" fill="#818cf8"/>
+      <rect x="8" y="13" width="7" height="3" rx="1" fill="#818cf8"/>
+      <circle cx="28" cy="12" r="2" fill="#ec4899" opacity="0.9"/>
+      <circle cx="32" cy="14.5" r="2" fill="#818cf8" opacity="0.9"/>
+      <circle cx="28" cy="17" r="2" fill="#5eead4" opacity="0.9"/>
+      <circle cx="24" cy="14.5" r="2" fill="#f59e0b" opacity="0.9"/>
+      <rect x="18" y="10" width="4" height="1.5" rx="0.75" fill="#475569"/>
+      <path d="M8 7C8 7 10 4 14 4H18" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M32 7C32 7 30 4 26 4H22" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+    JOSH ROCHA
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html#projects">Projects</a></li>
+    <li><a href="index.html#skills">Skills</a></li>
+    <li><a href="index.html#about">About</a></li>
+    <li><a href="Resume.pdf" target="_blank" rel="noopener noreferrer">Resume ↗</a></li>
+  </ul>
+  <a href="index.html#connect" class="nav-resume-btn">Connect</a>
+  <div class="hamburger" id="hamburger">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-tag">Case Study · Traffic Simulation Game</div>
+  <h1>EYES ON<br>THE ROAD</h1>
+  <p class="hero-sub">A traffic management simulation where players draw paths to guide pedestrians safely across intersections — balancing speed, safety, and score under real-time pressure.</p>
+  <div class="meta-row">
+    <div class="meta-pill"><span class="label">Engine</span><span class="value">Unity</span></div>
+    <div class="meta-pill"><span class="label">Language</span><span class="value">C#</span></div>
+    <div class="meta-pill"><span class="label">Platform</span><span class="value">PC / Web</span></div>
+    <div class="meta-pill"><span class="label">My Role</span><span class="value">Designer & Dev</span></div>
+    <div class="meta-pill"><span class="label">Team Size</span><span class="value">3 Members</span></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<div class="content">
+
+  <div class="intro-grid fade-up">
+    <div>
+      <div class="section-label">The Concept</div>
+      <h2 class="block-title">A Real-World System as a Game</h2>
+      <p class="prose">Eyes on the Road started as a <strong>simple, almost silly idea</strong> — what if you could draw the paths that pedestrians walk across a busy intersection? But as development progressed, it became a genuine simulation of how <strong>traffic management actually functions</strong>: decisions have consequences, timing matters, and poor choices cost lives.</p>
+      <p class="prose">The core challenge was designing a system where <strong>freeform player expression</strong> meets the rigid constraints of a real intersection — rewarding creative thinking while punishing carelessness.</p>
+    </div>
+    <div class="img-block">
+      <div class="img-placeholder">
+        <img src="Traffic.jpg" alt="Eyes on the Road gameplay" onerror="this.parentElement.innerHTML='🚦'">
+      </div>
+    </div>
+  </div>
+
+  <div class="full-section fade-up">
+    <div class="section-label">My Role</div>
+    <h2 class="block-title">What I Owned</h2>
+    <p class="prose" style="max-width:800px;">I worked as <strong>level and systems designer</strong>, while also owning the development of the environment and all pedestrian interaction and behavior systems. I was responsible for the feel and logic of the core gameplay loop from drawing to crossing to consequence.</p>
+    <div class="next-list" style="margin-top: 2rem;">
+      <div class="next-item"><span class="bullet">▸</span><p><strong style="color:var(--text)">Scene Layout & Camera</strong> — Designed the placement of all objects in scene, including establishing the player's camera point of view.</p></div>
+      <div class="next-item"><span class="bullet">▸</span><p><strong style="color:var(--text)">Path Drawing System</strong> — Designed and implemented the freeform path drawing mechanic, the core interaction of the entire game.</p></div>
+      <div class="next-item"><span class="bullet">▸</span><p><strong style="color:var(--text)">Sidewalk Zone Constraints</strong> — Created the zone-locking system that keeps pedestrians within realistic movement boundaries.</p></div>
+      <div class="next-item"><span class="bullet">▸</span><p><strong style="color:var(--text)">Pedestrian Behaviors</strong> — Developed path-following logic and collision reactions, including knockback and audio feedback on impact.</p></div>
+      <div class="next-item"><span class="bullet">▸</span><p><strong style="color:var(--text)">Penalty & Reward Systems</strong> — Implemented the scoring system with point gains for safe crossings and time/point deductions on collisions.</p></div>
+      <div class="next-item"><span class="bullet">▸</span><p><strong style="color:var(--text)">UI Design & Iteration</strong> — Built and repeatedly refined the HUD, adjusting placement and color coding for readability after playtesting feedback.</p></div>
+      <div class="next-item"><span class="bullet">▸</span><p><strong style="color:var(--text)">Car Movement System</strong> — Controlled and tuned the behavior of vehicles moving through the intersection.</p></div>
+    </div>
+  </div>
+
+  <div class="full-section fade-up">
+    <div class="section-label">Systems Design</div>
+    <h2 class="block-title">Core Mechanics</h2>
+    <div class="mechanics-grid">
+      <div class="mechanic-item"><div class="mechanic-icon">✏️</div><div><h5>Path Drawing</h5><p>Players draw freeform paths directly on screen to direct pedestrians across the intersection in real time.</p></div></div>
+      <div class="mechanic-item"><div class="mechanic-icon">🚶</div><div><h5>Pedestrian AI</h5><p>Pedestrians follow drawn paths, react to collisions with knockback, and respond dynamically to obstacles.</p></div></div>
+      <div class="mechanic-item"><div class="mechanic-icon">🏙️</div><div><h5>Sidewalk Zones</h5><p>Players lock into a sidewalk zone when drawing to prevent unrealistic cross-zone paths and reduce errors.</p></div></div>
+      <div class="mechanic-item"><div class="mechanic-icon">🚗</div><div><h5>Car System</h5><p>Vehicles move through the intersection on set patterns, creating real collision risk and time pressure.</p></div></div>
+      <div class="mechanic-item"><div class="mechanic-icon">🏆</div><div><h5>Score & Time</h5><p>+1 point per safe crossing, with point and time penalties on collisions — creating meaningful stakes per decision.</p></div></div>
+      <div class="mechanic-item"><div class="mechanic-icon">💥</div><div><h5>Collision Feedback</h5><p>Knockback physics and audio on impact make collisions feel consequential rather than abstract.</p></div></div>
+    </div>
+  </div>
+
+  <!-- VIDEO SHOWCASE -->
+  <div class="full-section fade-up">
+    <div class="section-label">See It In Action</div>
+    <h2 class="block-title">Gameplay Showcase</h2>
+    <div class="gif-grid">
+      <div class="gif-card" id="card1">
+        <div class="gif-wrapper">
+          <video id="vid1" src="Path.mp4" loop muted playsinline preload="metadata"></video>
+          <div class="play-overlay" id="overlay1">
+            <div class="play-icon">
+              <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+            <span class="play-hint">Hover to play</span>
+          </div>
+        </div>
+        <div class="gif-info">
+          <div class="gif-label">Mechanic</div>
+          <h4>Path Drawing</h4>
+          <p>Players draw freeform paths on screen in real time, directing pedestrians from sidewalk to sidewalk before traffic arrives.</p>
+        </div>
+      </div>
+      <div class="gif-card" id="card2">
+        <div class="gif-wrapper">
+          <video id="vid2" src="hit.mp4" loop muted playsinline preload="metadata"></video>
+          <div class="play-overlay" id="overlay2">
+            <div class="play-icon">
+              <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+            <span class="play-hint">Hover to play</span>
+          </div>
+        </div>
+        <div class="gif-info">
+          <div class="gif-label">Consequence</div>
+          <h4>Collision & Penalty</h4>
+          <p>When pedestrians are struck by vehicles, knockback physics and audio feedback make the consequence feel immediate and meaningful.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="full-section fade-up">
+    <div class="section-label">Design Process</div>
+    <h2 class="block-title">How We Built It</h2>
+    <div class="process-steps">
+      <div class="step-card"><div class="step-num">01</div><h4>Concept & Core Loop</h4><p>Established the core mechanic early — draw a path, pedestrian follows, car hits or misses — keeping scope tight and testable from day one.</p></div>
+      <div class="step-card"><div class="step-num">02</div><h4>Path System Prototype</h4><p>Built the freeform drawing system first, then layered in zone constraints and point spacing to prevent exploits and messy input.</p></div>
+      <div class="step-card"><div class="step-num">03</div><h4>Playtesting Rounds</h4><p>Ran iterative playtests focused on: is drawing responsive? Are boundaries clear? Do collisions feel impactful? Does scoring feel fair?</p></div>
+      <div class="step-card"><div class="step-num">04</div><h4>Polish & Feedback</h4><p>Applied playtesting feedback to refine UI readability, drawing smoothness, sidewalk clarity, and collision audio/visual response.</p></div>
+    </div>
+  </div>
+
+  <div class="full-section fade-up">
+    <div class="section-label">Design Decisions & Tradeoffs</div>
+    <h2 class="block-title">Intentional Choices</h2>
+    <div class="tradeoff-grid">
+      <div class="tradeoff-card">
+        <h4>Freeform Drawing vs Control</h4>
+        <p>Freeform path drawing gives players more agency, but introduced messy paths and unnecessary movement. Constraints like point spacing and directional limits were added to keep input clean.</p>
+        <span class="tradeoff-pill">Expressive — More Complex</span>
+      </div>
+      <div class="tradeoff-card">
+        <h4>Sidewalk Zone Locking</h4>
+        <p>Once a player starts drawing from a sidewalk, they're locked to that zone. This prevents unrealistic paths across multiple zones and protects the simulation's logic — at the cost of some creative freedom.</p>
+        <span class="tradeoff-pill">Less freedom — fewer errors</span>
+      </div>
+      <div class="tradeoff-card">
+        <h4>Reward vs Penalty System</h4>
+        <p>The scoring system gives +1 for safe crossings and deducts both points and time on collisions. The early prototype had confusing UI, so placement and color coding were iterated on heavily across playtesting rounds.</p>
+        <span class="tradeoff-pill">Needed iteration to feel clear</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="full-section fade-up">
+    <div class="section-label">Playtesting</div>
+    <h2 class="block-title">What Changed Through Testing</h2>
+    <div class="challenges-grid">
+      <div class="challenge-pair">
+        <div class="challenge-card problem"><span class="ch-label">Before</span><h4>Sluggish Drawing</h4><p>Input delay made path drawing feel unresponsive, breaking the real-time feel of guiding pedestrians under pressure.</p></div>
+        <div class="challenge-card solution"><span class="ch-label">After</span><h4>Smoother Input</h4><p>Reduced delay and improved responsiveness so drawing paths felt immediate and precise under time pressure.</p></div>
+      </div>
+      <div class="challenge-pair">
+        <div class="challenge-card problem"><span class="ch-label">Before</span><h4>Unclear Boundaries</h4><p>Players drew across multiple sidewalk zones, creating unrealistic paths and breaking simulation logic without realizing it.</p></div>
+        <div class="challenge-card solution"><span class="ch-label">After</span><h4>Zone Locking</h4><p>Enforced sidewalk-only drawing and zone locking so players always understood the spatial rules of the intersection.</p></div>
+      </div>
+      <div class="challenge-pair">
+        <div class="challenge-card problem"><span class="ch-label">Before</span><h4>Unreadable UI</h4><p>Score, time, and penalty feedback was poorly placed and unlabeled, leaving players confused about what was happening.</p></div>
+        <div class="challenge-card solution"><span class="ch-label">After</span><h4>Color-Coded HUD</h4><p>Improved placement and color-coded feedback elements so the UI communicated reward and penalty instantly and clearly.</p></div>
+      </div>
+      <div class="challenge-pair">
+        <div class="challenge-card problem"><span class="ch-label">Before</span><h4>Weightless Collisions</h4><p>When pedestrians were hit by cars, there was no physical or audio response — the consequence felt abstract and low-stakes.</p></div>
+        <div class="challenge-card solution"><span class="ch-label">After</span><h4>Impactful Feedback</h4><p>Added knockback physics and collision audio so every impact felt meaningful and reinforced the cost of poor decisions.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="full-section fade-up">
+    <div class="section-label">Source Code & Play</div>
+    <h2 class="block-title">Access the Project</h2>
+    <div class="repo-block">
+      <div class="repo-info">
+        <div class="repo-icon">🚦</div>
+        <div>
+          <h4>Eyes on the Road — GitHub & itch.io</h4>
+          <p>Browse the full Unity source code on GitHub, or jump straight into the browser-playable build on itch.io — no download required.</p>
+        </div>
+      </div>
+      <div class="repo-btns">
+        <a href="https://github.com/ClockworkElements/Eyes-On-the-Road" target="_blank" rel="noopener noreferrer" class="repo-btn">GitHub ↗</a>
+        <a href="https://jkr81.itch.io/eyes-on-the-road" target="_blank" rel="noopener noreferrer" class="repo-btn amber">Play ↗</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="full-section fade-up">
+    <div class="section-label">Results</div>
+    <h2 class="block-title">What We Delivered</h2>
+    <p class="prose" style="max-width:780px; margin-bottom:0;">Eyes on the Road shipped as a <strong>fully playable browser game</strong> with a complete gameplay loop — drawing, crossing, scoring, and consequences — built by a team of 3 and shaped entirely by iterative playtesting and real player feedback.</p>
+    <div class="outcomes-bar">
+      <div class="outcome-stat"><div class="num">3</div><div class="desc">Team members<br>collaborating</div></div>
+      <div class="outcome-stat"><div class="num">4</div><div class="desc">Playtesting rounds<br>driving iteration</div></div>
+      <div class="outcome-stat"><div class="num">3</div><div class="desc">Major design tradeoffs<br>resolved through testing</div></div>
+      <div class="outcome-stat"><div class="num">∞</div><div class="desc">Paths drawn,<br>lives saved (or not)</div></div>
+    </div>
+  </div>
+
+  <div class="full-section fade-up">
+    <div class="section-label">Next Steps</div>
+    <h2 class="block-title">What I'd Improve</h2>
+    <div class="next-list">
+      <div class="next-item"><span class="bullet">▸</span><p>More complex car behavior — turning vehicles and varied traffic patterns across intersections</p></div>
+      <div class="next-item"><span class="bullet">▸</span><p>Highlighted zones showing incoming traffic lanes so players can make more informed path decisions</p></div>
+      <div class="next-item"><span class="bullet">▸</span><p>Structured difficulty levels that introduce complexity gradually rather than scaling pressure alone</p></div>
+      <div class="next-item"><span class="bullet">▸</span><p>Professional custom UI to replace stock Unity components and improve the overall visual polish</p></div>
+      <div class="next-item"><span class="bullet">▸</span><p>A straight-line only drawing mode as an alternative constraint system for cleaner, more predictable paths</p></div>
+      <div class="next-item"><span class="bullet">▸</span><p>Distracted pedestrian types — phone-walkers who ignore drawn paths and create unpredictable behavior</p></div>
+    </div>
+  </div>
+
+  <div class="full-section fade-up">
+    <div class="section-label">Final Reflection</div>
+    <h2 class="block-title">What This Project Taught Me</h2>
+    <div class="reflection-block">
+      <div class="quote-mark">"</div>
+      <p>This project showed how a <strong>simple game mechanic can become a representation of a real-world system</strong>. What started as a silly, humorous concept developed into a simulation of how traffic actually functions — with real consequences for poor decision making.</p>
+      <p>One of the biggest takeaways was realizing <strong>how much structure lives beneath a simple system</strong>. Path drawing, sidewalk zones, and basic loops felt like learning systems that mirrored real-world limitations. That changed my perspective on how a game built for fun can have genuine educational impact — keeping your eyes on the road means something.</p>
+      <p>Overall, this project reinforced the importance of <strong>iteration and feedback</strong>, and how even the simplest gameplay can carry real meaning behind it.</p>
+    </div>
+  </div>
+
+  <div class="cta-block fade-up">
+    <h3>Try It Yourself</h3>
+    <p>The game is live and playable in the browser — see how many pedestrians you can get across safely.</p>
+    <div class="cta-btns">
+      <a href="https://jkr81.itch.io/eyes-on-the-road" target="_blank" rel="noopener noreferrer" class="btn-primary">Play on itch.io ↗</a>
+      <a href="index.html" class="btn-outline">← Back to Portfolio</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+  }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  // Hover-to-play video cards
+  [1, 2].forEach(n => {
+    const card = document.getElementById('card' + n);
+    const vid  = document.getElementById('vid' + n);
+    const ov   = document.getElementById('overlay' + n);
+    if (!card || !vid || !ov) return;
+    card.addEventListener('mouseenter', () => {
+      vid.play();
+      ov.classList.add('hidden');
+    });
+    card.addEventListener('mouseleave', () => {
+      vid.pause();
+      vid.currentTime = 0;
+      ov.classList.remove('hidden');
+    });
+  });
+
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+    document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+  });
+  document.querySelectorAll('.mobile-link').forEach(link => {
+    link.addEventListener('click', () => {
+      hamburger.classList.remove('open');
+      mobileMenu.classList.remove('open');
+      document.body.style.overflow = '';
+    });
+  });
+</script>
+</body>
+</html>

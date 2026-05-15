@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cyber Siege — Case Study · Josh Rocha</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 28'><path d='M8 6C5 6 2 9 2 14C2 20 5 26 9 26C11 26 13 24 15 22H25C27 24 29 26 31 26C35 26 38 20 38 14C38 9 35 6 32 6H8Z' fill='%236366f1'/><rect x='10' y='11' width='3' height='8' rx='1' fill='white'/><rect x='8' y='13' width='7' height='3' rx='1' fill='white'/><circle cx='28' cy='12' r='2.2' fill='%23ec4899'/><circle cx='32.5' cy='15' r='2.2' fill='white'/><circle cx='28' cy='18' r='2.2' fill='%2314b8a6'/><circle cx='23.5' cy='15' r='2.2' fill='%23f59e0b'/></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #060810; --surface: #0d1117; --card: rgba(17,24,39,0.8);
+      --indigo: #6366f1; --indigo-light: #818cf8; --pink: #ec4899;
+      --teal: #14b8a6; --teal-light: #5eead4;
+      --text: #f1f5f9; --muted: #94a3b8; --dim: #475569; --grid: rgba(99,102,241,0.06);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Space Grotesk', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+    .grid-bg { position: fixed; inset: 0; background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 50px 50px; pointer-events: none; z-index: 0; }
+    .scanlines { position: fixed; inset: 0; background: repeating-linear-gradient(to bottom, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px); pointer-events: none; z-index: 0; opacity: 0.4; }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed; top: 0; width: 100%;
+      padding: 1.5rem 3rem;
+      background: rgba(6,8,16,0.92);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(99,102,241,0.15);
+      z-index: 1000;
+      display: flex; justify-content: space-between; align-items: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    .logo {
+      font-family: 'Orbitron', monospace; font-size: 1.4rem; font-weight: 900;
+      color: var(--indigo-light); text-shadow: 0 0 20px rgba(99,102,241,0.5);
+      letter-spacing: 2px; display: flex; align-items: center; gap: 0.8rem;
+      text-decoration: none; transition: all 0.3s ease;
+    }
+    .logo:hover { color: var(--teal); text-shadow: 0 0 30px rgba(20,184,166,0.6); }
+    .logo-icon { width: 32px; height: 32px; flex-shrink: 0; filter: drop-shadow(0 0 8px rgba(99,102,241,0.6)); transition: filter 0.3s ease; animation: logoFloat 3s ease-in-out infinite; }
+    .logo:hover .logo-icon { filter: drop-shadow(0 0 12px rgba(20,184,166,0.7)); }
+    @keyframes logoFloat { 0%,100%{transform:translateY(0) rotate(0deg);} 50%{transform:translateY(-5px) rotate(5deg);} }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; align-items: center; }
+    .nav-links a { color: #cbd5e1; text-decoration: none; font-family: 'Orbitron', monospace; font-weight: 600; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; position: relative; transition: all 0.3s ease; }
+    .nav-links a::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px; background: var(--indigo-light); transition: width 0.3s ease; }
+    .nav-links a:hover { color: var(--indigo-light); }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-resume-btn {
+      padding: 0.7rem 1.8rem; background: linear-gradient(135deg, var(--indigo), var(--pink));
+      border: none; color: white; font-family: 'Orbitron', monospace; font-weight: 700; font-size: 0.9rem;
+      text-transform: uppercase; letter-spacing: 1.5px; text-decoration: none; border-radius: 50px;
+      transition: all 0.3s ease; box-shadow: 0 5px 20px rgba(99,102,241,0.3);
+    }
+    .nav-resume-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(99,102,241,0.5); }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; z-index: 1100; }
+    .hamburger span { display: block; width: 24px; height: 2px; background: var(--indigo-light); border-radius: 2px; transition: all 0.3s ease; }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .mobile-menu { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(6,8,16,0.98); backdrop-filter: blur(20px); z-index: 999; flex-direction: column; align-items: center; justify-content: center; gap: 2.5rem; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+    .mobile-menu.open { opacity: 1; pointer-events: all; }
+    .mobile-menu a { color: #cbd5e1; text-decoration: none; font-family: 'Orbitron', monospace; font-weight: 700; font-size: 1.4rem; text-transform: uppercase; letter-spacing: 2px; transition: color 0.3s; }
+    .mobile-menu a:hover { color: var(--indigo-light); }
+    .mobile-menu .mob-connect { padding: 0.9rem 2.5rem; background: linear-gradient(135deg, var(--indigo), var(--pink)); border-radius: 50px; color: white; font-size: 1rem; }
+
+    /* ─── HERO ─── */
+    .hero { position: relative; z-index: 2; padding: 9rem 3rem 4rem; max-width: 1100px; margin: 0 auto; }
+    .hero-tag { display: inline-flex; align-items: center; gap: 0.5rem; font-family: 'Orbitron', monospace; font-size: 0.72rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--teal); background: rgba(20,184,166,0.08); border: 1px solid rgba(20,184,166,0.25); padding: 0.4rem 1rem; border-radius: 100px; margin-bottom: 1.8rem; }
+    .hero-tag::before { content: '▸'; }
+    .hero h1 { font-family: 'Orbitron', monospace; font-size: clamp(3rem,7vw,5.5rem); font-weight: 900; line-height: 1; margin-bottom: 1.5rem; background: linear-gradient(135deg, #fff 0%, var(--indigo-light) 50%, var(--pink) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero-sub { font-size: 1.2rem; font-weight: 300; color: var(--muted); max-width: 620px; line-height: 1.7; margin-bottom: 2.5rem; }
+    .meta-row { display: flex; flex-wrap: wrap; gap: 1rem; }
+    .meta-pill { display: flex; flex-direction: column; gap: 0.2rem; padding: 0.7rem 1.3rem; background: var(--card); border: 1px solid rgba(99,102,241,0.15); border-radius: 12px; backdrop-filter: blur(10px); }
+    .meta-pill .label { font-size: 0.65rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--dim); }
+    .meta-pill .value { font-family: 'Orbitron', monospace; font-size: 0.85rem; font-weight: 700; color: var(--indigo-light); }
+    .divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(99,102,241,0.3), transparent); margin: 0 3rem; position: relative; z-index: 2; }
+
+    /* ─── CONTENT ─── */
+    .content { max-width: 1100px; margin: 0 auto; padding: 4rem 3rem 7rem; position: relative; z-index: 2; }
+    .intro-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-bottom: 4.5rem; align-items: center; }
+    .intro-grid .img-block { align-self: center; margin-top: 2.5rem; }
+    .full-section { margin-bottom: 4.5rem; }
+    .section-label { font-family: 'Orbitron', monospace; font-size: 0.7rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--teal); margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem; }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(20,184,166,0.3), transparent); max-width: 60px; }
+    h2.block-title { font-family: 'Orbitron', monospace; font-size: 1.8rem; font-weight: 900; color: var(--text); margin-bottom: 1.2rem; line-height: 1.2; }
+    .prose { font-size: 1.05rem; line-height: 1.8; color: var(--muted); font-weight: 400; }
+    .prose strong { color: var(--text); font-weight: 600; }
+    .prose + .prose { margin-top: 1.2rem; }
+
+    .img-block { position: relative; border-radius: 16px; overflow: hidden; border: 1px solid rgba(99,102,241,0.15); background: var(--card); }
+    .img-block img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .img-placeholder { width: 100%; aspect-ratio: 16/10; display: flex; align-items: center; justify-content: center; font-size: 5rem; background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(236,72,153,0.08)); }
+
+    /* Process steps */
+    .process-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 1.5rem; margin-top: 2rem; }
+    .step-card { background: var(--card); border: 1px solid rgba(99,102,241,0.15); border-radius: 16px; padding: 1.8rem; position: relative; overflow: hidden; transition: all 0.3s ease; }
+    .step-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--indigo), var(--pink)); opacity: 0; transition: opacity 0.3s; }
+    .step-card:hover { border-color: rgba(99,102,241,0.35); transform: translateY(-4px); box-shadow: 0 12px 30px rgba(99,102,241,0.15); }
+    .step-card:hover::before { opacity: 1; }
+    .step-num { font-family: 'Orbitron', monospace; font-size: 2rem; font-weight: 900; margin-bottom: 0.8rem; line-height: 1; background: linear-gradient(135deg, var(--indigo-light), var(--teal-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; filter: drop-shadow(0 0 8px rgba(99,102,241,0.4)); }
+    .step-card h4 { font-family: 'Orbitron', monospace; font-size: 0.85rem; font-weight: 700; color: var(--indigo-light); margin-bottom: 0.6rem; letter-spacing: 0.5px; text-transform: uppercase; }
+    .step-card p { font-size: 0.9rem; line-height: 1.6; color: var(--muted); }
+
+    /* Mechanics grid */
+    .mechanics-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 1.2rem; margin-top: 2rem; }
+    .mechanic-item { background: var(--card); border: 1px solid rgba(99,102,241,0.12); border-radius: 12px; padding: 1.6rem; display: flex; align-items: center; gap: 1.2rem; transition: all 0.3s ease; }
+    .mechanic-item:hover { border-color: rgba(20,184,166,0.3); background: rgba(20,184,166,0.04); }
+    .mechanic-icon { font-size: 2rem; flex-shrink: 0; }
+    .mechanic-item h5 { font-family: 'Orbitron', monospace; font-size: 0.78rem; font-weight: 700; color: var(--teal); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.3rem; }
+    .mechanic-item p { font-size: 0.9rem; color: var(--muted); line-height: 1.5; }
+
+    /* Video embed */
+    .video-embed-wrap { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: 16px; overflow: hidden; border: 1px solid rgba(99,102,241,0.2); margin-top: 2rem; background: #000; }
+    .video-embed-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; display: block; }
+
+    /* Screenshots grid */
+    .screenshots-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-top: 2rem; }
+    .screenshot-slot { position: relative; aspect-ratio: 16/10; border-radius: 12px; overflow: hidden; border: 1px solid rgba(99,102,241,0.15); cursor: pointer; transition: all 0.3s ease; }
+    .screenshot-slot:hover { border-color: rgba(99,102,241,0.5); transform: scale(1.02); box-shadow: 0 8px 25px rgba(99,102,241,0.2); }
+    .screenshot-slot img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s ease; }
+    .screenshot-slot:hover img { transform: scale(1.06); }
+    .screenshot-num { position: absolute; bottom: 7px; right: 9px; font-family: 'Orbitron', monospace; font-size: 0.6rem; font-weight: 700; letter-spacing: 1px; color: var(--indigo-light); background: rgba(6,8,16,0.8); padding: 2px 7px; border-radius: 4px; }
+
+    /* Lightbox */
+    .lightbox { display: none; position: fixed; inset: 0; background: rgba(6,8,16,0.96); z-index: 2000; align-items: center; justify-content: center; flex-direction: column; gap: 1.5rem; backdrop-filter: blur(12px); }
+    .lightbox.active { display: flex; }
+    .lightbox-img-wrap { position: relative; display: flex; align-items: center; justify-content: center; }
+    .lightbox img { max-width: 80vw; max-height: 72vh; object-fit: contain; border: 1px solid rgba(99,102,241,0.3); border-radius: 12px; display: block; }
+    .lightbox-close { position: fixed; top: 1.8rem; right: 2rem; font-family: 'Orbitron', monospace; font-size: 0.75rem; font-weight: 700; letter-spacing: 2px; color: var(--pink); background: rgba(6,8,16,0.8); border: 1px solid rgba(236,72,153,0.4); padding: 0.5rem 1.2rem; cursor: pointer; border-radius: 8px; transition: all 0.3s ease; z-index: 10; }
+    .lightbox-close:hover { background: rgba(236,72,153,0.2); }
+    .lightbox-nav { display: flex; align-items: center; gap: 1.5rem; }
+    .lightbox-counter { font-family: 'Orbitron', monospace; font-size: 0.7rem; font-weight: 700; letter-spacing: 2px; color: var(--indigo-light); opacity: 0.7; min-width: 60px; text-align: center; }
+    .lightbox-btn { width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(99,102,241,0.4); background: rgba(99,102,241,0.1); color: var(--indigo-light); font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; font-family: monospace; line-height: 1; }
+    .lightbox-btn:hover { background: rgba(99,102,241,0.25); border-color: var(--indigo-light); transform: scale(1.1); }
+    .lightbox-btn:disabled { opacity: 0.2; cursor: default; transform: none; }
+
+    /* Challenges */
+    .challenges-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-top: 2rem; }
+    .challenge-pair { display: contents; }
+    .challenge-card { background: var(--card); border: 1px solid rgba(99,102,241,0.15); padding: 1.5rem; position: relative; }
+    .challenge-card.problem { border-right: none; }
+    .challenge-card.solution { border-left: 1px solid rgba(99,102,241,0.15); }
+    .challenge-pair:first-child .challenge-card.problem { border-top-left-radius: 16px; }
+    .challenge-pair:first-child .challenge-card.solution { border-top-right-radius: 16px; }
+    .challenge-pair:last-child .challenge-card.problem { border-bottom-left-radius: 16px; }
+    .challenge-pair:last-child .challenge-card.solution { border-bottom-right-radius: 16px; }
+    .challenge-pair + .challenge-pair .challenge-card { border-top: 1px solid rgba(99,102,241,0.08); }
+    .challenge-card.problem::after { content: '→'; position: absolute; right: -14px; top: 50%; transform: translateY(-50%); font-size: 1.1rem; color: var(--indigo-light); z-index: 10; background: var(--bg); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid rgba(99,102,241,0.3); font-family: monospace; }
+    .challenge-card .ch-label { font-family: 'Orbitron', monospace; font-size: 0.65rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 0.3rem 0.7rem; border-radius: 6px; margin-bottom: 0.8rem; display: inline-block; }
+    .challenge-card.problem .ch-label { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
+    .challenge-card.solution .ch-label { background: rgba(20,184,166,0.12); color: var(--teal); border: 1px solid rgba(20,184,166,0.2); }
+    .challenge-card h4 { font-family: 'Orbitron', monospace; font-size: 0.9rem; font-weight: 700; color: var(--text); margin-bottom: 0.6rem; }
+    .challenge-card p { font-size: 0.9rem; line-height: 1.6; color: var(--muted); }
+
+    /* Outcomes */
+    .outcomes-bar { background: var(--card); border: 1px solid rgba(99,102,241,0.15); border-radius: 20px; padding: 2.5rem; margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 2rem; }
+    .outcome-stat { text-align: center; }
+    .outcome-stat .num { font-family: 'Orbitron', monospace; font-size: 2.8rem; font-weight: 900; background: linear-gradient(135deg, var(--indigo-light), var(--teal)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; margin-bottom: 0.5rem; }
+    .outcome-stat .desc { font-size: 0.85rem; color: var(--muted); line-height: 1.4; }
+
+    /* Next list */
+    .next-list { display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1.5rem; }
+    .next-item { display: flex; align-items: flex-start; gap: 1rem; padding: 1rem 1.3rem; background: var(--card); border: 1px solid rgba(99,102,241,0.1); border-radius: 10px; transition: all 0.3s ease; }
+    .next-item:hover { border-color: rgba(99,102,241,0.3); transform: translateX(6px); }
+    .next-item .bullet { color: var(--indigo-light); font-family: 'Orbitron', monospace; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; margin-top: 0.1rem; }
+    .next-item p { font-size: 0.95rem; color: var(--muted); line-height: 1.5; }
+
+    /* Repo block */
+    .repo-block { background: var(--card); border: 1px solid rgba(99,102,241,0.2); border-radius: 20px; padding: 2rem 2.5rem; margin-top: 2rem; display: flex; align-items: center; justify-content: space-between; gap: 2rem; flex-wrap: wrap; position: relative; overflow: hidden; transition: all 0.3s ease; }
+    .repo-block::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--indigo), var(--pink), var(--teal)); }
+    .repo-block:hover { border-color: rgba(99,102,241,0.4); box-shadow: 0 10px 30px rgba(99,102,241,0.15); }
+    .repo-info { display: flex; align-items: center; gap: 1.5rem; }
+    .repo-icon { font-size: 2.5rem; flex-shrink: 0; }
+    .repo-info h4 { font-family: 'Orbitron', monospace; font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 0.3rem; }
+    .repo-info p { font-size: 0.9rem; color: var(--muted); line-height: 1.5; max-width: 500px; }
+    .repo-btn { padding: 0.8rem 1.8rem; background: transparent; border: 2px solid var(--indigo-light); color: var(--indigo-light); text-decoration: none; border-radius: 10px; font-family: 'Orbitron', monospace; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s ease; white-space: nowrap; display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
+    .repo-btn:hover { background: var(--indigo); border-color: var(--indigo); color: white; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(99,102,241,0.3); }
+    .repo-btn.teal { border-color: var(--teal); color: var(--teal); }
+    .repo-btn.teal:hover { background: var(--teal); border-color: var(--teal); color: var(--bg); }
+    .repo-btns { display: flex; gap: 1rem; flex-wrap: wrap; flex-shrink: 0; }
+
+    /* CTA */
+    .cta-block { margin-top: 4.5rem; text-align: center; padding: 4rem 3rem; background: var(--card); border: 1px solid rgba(99,102,241,0.2); border-radius: 24px; position: relative; overflow: hidden; }
+    .cta-block::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at center, rgba(99,102,241,0.05) 0%, transparent 60%); }
+    .cta-block h3 { font-family: 'Orbitron', monospace; font-size: 1.8rem; font-weight: 900; color: var(--text); margin-bottom: 1rem; position: relative; z-index: 1; }
+    .cta-block p { font-size: 1rem; color: var(--muted); margin-bottom: 2rem; position: relative; z-index: 1; }
+    .cta-btns { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; position: relative; z-index: 1; }
+    .btn-primary { padding: 0.9rem 2.2rem; background: linear-gradient(135deg, var(--indigo), var(--pink)); color: white; text-decoration: none; font-family: 'Orbitron', monospace; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1.5px; border-radius: 100px; transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(99,102,241,0.3); }
+    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(99,102,241,0.5); }
+    .btn-outline { padding: 0.9rem 2.2rem; background: transparent; color: var(--teal); text-decoration: none; font-family: 'Orbitron', monospace; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1.5px; border-radius: 100px; border: 2px solid var(--teal); transition: all 0.3s ease; }
+    .btn-outline:hover { background: var(--teal); color: var(--bg); transform: translateY(-3px); box-shadow: 0 15px 35px rgba(20,184,166,0.3); }
+
+    .fade-up { opacity: 0; transform: translateY(30px); transition: all 0.7s cubic-bezier(0.16,1,0.3,1); }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links, .nav-resume-btn { display: none; }
+      .hamburger { display: flex; }
+      .mobile-menu { display: flex; }
+      .hero { padding: 7rem 1.5rem 3rem; }
+      .content { padding: 3rem 1.5rem 5rem; }
+      .hero h1 { font-size: 2.8rem; }
+      .intro-grid { grid-template-columns: 1fr; }
+      .intro-grid .img-block { margin-top: 0; }
+      .mechanics-grid { grid-template-columns: 1fr; }
+      .challenges-grid { grid-template-columns: 1fr; }
+      .challenge-pair { display: block; margin-bottom: 0.5rem; }
+      .challenge-card.problem { border-right: 1px solid rgba(99,102,241,0.15); border-bottom: none; border-radius: 16px 16px 0 0 !important; }
+      .challenge-card.solution { border-radius: 0 0 16px 16px !important; }
+      .challenge-card.problem::after { display: none; }
+      .outcomes-bar { grid-template-columns: 1fr 1fr; }
+      .divider { margin: 0 1.5rem; }
+      .screenshots-grid { grid-template-columns: 1fr 1fr; }
+      .repo-block { flex-direction: column; align-items: flex-start; }
+      .repo-btns { width: 100%; }
+      .repo-btn { flex: 1; justify-content: center; }
+    }
+    @media (max-width: 480px) {
+      .mechanics-grid { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 2.2rem; }
+      .screenshots-grid { grid-template-columns: 1fr; }
+      .process-steps { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+  <div class="scanlines"></div>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html#projects" class="mobile-link">Projects</a>
+    <a href="index.html#skills" class="mobile-link">Skills</a>
+    <a href="index.html#about" class="mobile-link">About</a>
+    <a href="Resume.pdf" target="_blank" rel="noopener noreferrer" class="mobile-link">Resume ↗</a>
+    <a href="index.html#connect" class="mob-connect mobile-link">Connect</a>
+  </div>
+
+  <nav>
+    <a href="index.html" class="logo">
+      <svg class="logo-icon" viewBox="0 0 40 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 6C5 6 2 9 2 14C2 20 5 26 9 26C11 26 13 24 15 22H25C27 24 29 26 31 26C35 26 38 20 38 14C38 9 35 6 32 6H8Z" fill="rgba(99,102,241,0.15)" stroke="#818cf8" stroke-width="1.5"/>
+        <rect x="10" y="11" width="3" height="8" rx="1" fill="#818cf8"/>
+        <rect x="8" y="13" width="7" height="3" rx="1" fill="#818cf8"/>
+        <circle cx="28" cy="12" r="2" fill="#ec4899" opacity="0.9"/>
+        <circle cx="32" cy="14.5" r="2" fill="#818cf8" opacity="0.9"/>
+        <circle cx="28" cy="17" r="2" fill="#5eead4" opacity="0.9"/>
+        <circle cx="24" cy="14.5" r="2" fill="#f59e0b" opacity="0.9"/>
+        <rect x="18" y="10" width="4" height="1.5" rx="0.75" fill="#475569"/>
+        <path d="M8 7C8 7 10 4 14 4H18" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M32 7C32 7 30 4 26 4H22" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      JOSH ROCHA
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html#projects">Projects</a></li>
+      <li><a href="index.html#skills">Skills</a></li>
+      <li><a href="index.html#about">About</a></li>
+      <li><a href="Resume.pdf" target="_blank" rel="noopener noreferrer">Resume ↗</a></li>
+    </ul>
+    <a href="index.html#connect" class="nav-resume-btn">Connect</a>
+    <div class="hamburger" id="hamburger">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+
+  <!-- ─── HERO ─── -->
+  <section class="hero">
+    <div class="hero-tag">Case Study · VR Space Shooter</div>
+    <h1>CYBER<br>SIEGE</h1>
+    <p class="hero-sub">A first-person VR space shooter where players pilot a spacecraft through a procedurally generated asteroid tunnel, battling waves of android enemies in immersive, escalating combat built for Meta Quest.</p>
+    <div class="meta-row">
+      <div class="meta-pill"><span class="label">Engine</span><span class="value">Unity URP</span></div>
+      <div class="meta-pill"><span class="label">Language</span><span class="value">C#</span></div>
+      <div class="meta-pill"><span class="label">Platform</span><span class="value">Meta Quest</span></div>
+      <div class="meta-pill"><span class="label">Duration</span><span class="value">2 Weeks</span></div>
+      <div class="meta-pill"><span class="label">Team Size</span><span class="value">Solo</span></div>
+      <div class="meta-pill"><span class="label">My Role</span><span class="value">Designer & Dev</span></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <div class="content">
+
+    <!-- OVERVIEW -->
+    <div class="intro-grid fade-up">
+      <div>
+        <div class="section-label">The Concept</div>
+        <h2 class="block-title">Immersive Combat in Deep Space</h2>
+        <p class="prose">Cyber Siege started from a direct challenge: <strong>build a fully playable VR shooter from scratch in two weeks</strong>, solo — no team, no existing codebase, just Unity and a Meta Quest.</p>
+        <p class="prose">The design goal was to create a sense of <strong>constant forward pressure</strong> — players are propelled through a hostile asteroid field with threats emerging from all angles, demanding full spatial awareness and fast reflexes inside a truly immersive VR environment.</p>
+      </div>
+      <div class="img-block">
+        <div class="img-placeholder">
+          <img src="tunnel.jpg" alt="Cyber Siege gameplay" onerror="this.parentElement.innerHTML='🚀'">
+        </div>
+      </div>
+    </div>
+
+    <!-- DESIGN PROCESS -->
+    <div class="full-section fade-up">
+      <div class="section-label">Design Process</div>
+      <h2 class="block-title">How I Built It</h2>
+      <div class="process-steps">
+        <div class="step-card"><div class="step-num">01</div><h4>Concept & Scope</h4><p>Defined the core loop early — tunnel movement, shooting, enemy waves, scoring — to keep the solo two-week build focused and achievable.</p></div>
+        <div class="step-card"><div class="step-num">02</div><h4>XR Foundation</h4><p>Set up OpenXR and XR Interaction Toolkit first, establishing player movement, hand tracking, and controller input before any gameplay systems.</p></div>
+        <div class="step-card"><div class="step-num">03</div><h4>Systems Build</h4><p>Built shooting, enemy AI, health, scoring, and the procedural asteroid tunnel iteratively — testing on hardware at each stage.</p></div>
+        <div class="step-card"><div class="step-num">04</div><h4>Quest Optimization</h4><p>Profiled and tuned shaders, lighting, and spawn density to hit a stable frame rate on standalone Quest hardware before final build.</p></div>
+      </div>
+    </div>
+
+    <!-- CORE MECHANICS -->
+    <div class="full-section fade-up">
+      <div class="section-label">Systems Design</div>
+      <h2 class="block-title">Core Mechanics</h2>
+      <div class="mechanics-grid">
+        <div class="mechanic-item"><div class="mechanic-icon">🚀</div><div><h5>XR Movement</h5><p>Ship syncs with XR Origin — the headset and controllers directly drive navigation through the asteroid tunnel.</p></div></div>
+        <div class="mechanic-item"><div class="mechanic-icon">🔫</div><div><h5>Shooting System</h5><p>Physics-based projectiles with per-bullet hit flags — no double-registrations, clean collisions every time.</p></div></div>
+        <div class="mechanic-item"><div class="mechanic-icon">👾</div><div><h5>Enemy AI</h5><p>Two enemy types — standard white units and elite red androids — spawning dynamically ahead of the player.</p></div></div>
+        <div class="mechanic-item"><div class="mechanic-icon">📈</div><div><h5>Difficulty Scaling</h5><p>Speed, spawn rate, and damage all increase over time — no dead zones or lull periods at higher depths.</p></div></div>
+        <div class="mechanic-item"><div class="mechanic-icon">🌌</div><div><h5>Asteroid Tunnel</h5><p>Procedurally generated tunnel with static and moving asteroids plus a hyperspace effect attached to the player.</p></div></div>
+        <div class="mechanic-item"><div class="mechanic-icon">🖥️</div><div><h5>HUD & Game Flow</h5><p>Real-time health, score, and kill count — plus full win/lose panels with restart for complete replayability.</p></div></div>
+      </div>
+    </div>
+
+    <!-- MEDIA -->
+    <div class="full-section fade-up">
+      <div class="section-label">Gameplay Footage</div>
+      <h2 class="block-title">See It In Action</h2>
+      <div class="video-embed-wrap">
+        <iframe src="https://www.youtube.com/embed/lCDfraMuyfY?rel=0" allowfullscreen></iframe>
+      </div>
+    </div>
+
+    <!-- SCREENSHOTS -->
+    <div class="full-section fade-up">
+      <div class="section-label">Screenshots</div>
+      <h2 class="block-title">Game Gallery</h2>
+      <div class="screenshots-grid">
+        <div class="screenshot-slot" onclick="openLightbox(this)"><img src="ship.jpg" alt="Spacecraft in editor"><div class="screenshot-num">01</div></div>
+        <div class="screenshot-slot" onclick="openLightbox(this)"><img src="panel2.jpg" alt="Pilot briefing panel"><div class="screenshot-num">02</div></div>
+        <div class="screenshot-slot" onclick="openLightbox(this)"><img src="panel1.jpg" alt="Combat systems briefing"><div class="screenshot-num">03</div></div>
+        <div class="screenshot-slot" onclick="openLightbox(this)"><img src="tunnel.jpg" alt="Active gameplay"><div class="screenshot-num">04</div></div>
+        <div class="screenshot-slot" onclick="openLightbox(this)"><img src="boss.jpg" alt="Mission complete screen"><div class="screenshot-num">05</div></div>
+        <div class="screenshot-slot" onclick="openLightbox(this)"><img src="complete.jpg" alt="Enemy encounter"><div class="screenshot-num">06</div></div>
+      </div>
+    </div>
+
+    <!-- MY CONTRIBUTIONS -->
+    <div class="full-section fade-up">
+      <div class="section-label">My Contributions</div>
+      <h2 class="block-title">What I Built</h2>
+      <div class="next-list">
+        <div class="next-item"><span class="bullet">▸</span><p><strong style="color:var(--text)">XR Interaction System</strong> — Built VR movement, hand tracking, and controller shooting from scratch using OpenXR and XR Interaction Toolkit.</p></div>
+        <div class="next-item"><span class="bullet">▸</span><p><strong style="color:var(--text)">Enemy Combat & AI</strong> — Developed both enemy types with health systems, damage response, directional targeting, and death effects.</p></div>
+        <div class="next-item"><span class="bullet">▸</span><p><strong style="color:var(--text)">Procedural Asteroid Tunnel</strong> — Designed and coded the generation system with a safe navigation radius, mixing static and moving asteroids.</p></div>
+        <div class="next-item"><span class="bullet">▸</span><p><strong style="color:var(--text)">Difficulty & Scoring</strong> — Built the progression system — escalating speed, spawn rate, and damage — plus the full kill and score tracking HUD.</p></div>
+        <div class="next-item"><span class="bullet">▸</span><p><strong style="color:var(--text)">UI & Game State</strong> — Created all UI panels, health/score display, win/lose flow, and the intro tutorial sequence.</p></div>
+        <div class="next-item"><span class="bullet">▸</span><p><strong style="color:var(--text)">Quest Optimization</strong> — Profiled and optimized URP shaders, lighting, and object density to hit stable frame rates on standalone hardware.</p></div>
+      </div>
+    </div>
+
+    <!-- SOURCE CODE -->
+    <div class="full-section fade-up">
+      <div class="section-label">Source Code & Download</div>
+      <h2 class="block-title">Access the Project</h2>
+      <div class="repo-block">
+        <div class="repo-info">
+          <div class="repo-icon">💻</div>
+          <div>
+            <h4>Cyber Siege — GitHub Repository</h4>
+            <p>Full Unity project source — C# scripts, XR configuration, enemy systems, procedural generation, and all gameplay systems. Browse, fork, or download the APK to sideload on Meta Quest.</p>
+          </div>
+        </div>
+        <div class="repo-btns">
+          <a href="https://github.com/Jkr81/Cyber-Siege" target="_blank" rel="noopener noreferrer" class="repo-btn">GitHub ↗</a>
+          <a href="https://github.com/Jkr81/Cyber-Siege-Documentation/releases/latest/download/CyberSiege.apk" download class="repo-btn teal">Download APK ↗</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHALLENGES -->
+    <div class="full-section fade-up">
+      <div class="section-label">Challenges & Solutions</div>
+      <h2 class="block-title">What I Overcame</h2>
+      <div class="challenges-grid">
+        <div class="challenge-pair">
+          <div class="challenge-card problem"><span class="ch-label">Challenge</span><h4>XR Origin vs Ship Movement</h4><p>Player movement conflicted with XR Origin, disconnecting the headset view from the ship's position mid-flight.</p></div>
+          <div class="challenge-card solution"><span class="ch-label">Solution</span><h4>Hybrid Follow System</h4><p>Implemented a sync system that couples ship position to XR Origin while maintaining smooth control continuity throughout.</p></div>
+        </div>
+        <div class="challenge-pair">
+          <div class="challenge-card problem"><span class="ch-label">Challenge</span><h4>Projectile Hit Detection</h4><p>Bullets would pass through targets or trigger multiple collision events on the same enemy, breaking combat reliability.</p></div>
+          <div class="challenge-card solution"><span class="ch-label">Solution</span><h4>Per-Bullet Hit Flags</h4><p>Added single-hit flags per projectile and reworked the collision hierarchy using GetComponentInParent() for clean one-hit registration.</p></div>
+        </div>
+        <div class="challenge-pair">
+          <div class="challenge-card problem"><span class="ch-label">Challenge</span><h4>Quest Performance</h4><p>High object counts — asteroids, enemies, and particle effects — caused frame rate drops on the standalone Quest hardware.</p></div>
+          <div class="challenge-card solution"><span class="ch-label">Solution</span><h4>URP Optimization</h4><p>Tuned URP shaders and lighting, limited spawn density, and disabled expensive effects like SSAO to hit a stable frame rate.</p></div>
+        </div>
+        <div class="challenge-pair">
+          <div class="challenge-card problem"><span class="ch-label">Challenge</span><h4>Enemy Spawning & Pacing</h4><p>Enemies appeared behind the player and dead zones with zero enemy presence kept breaking tension and immersion.</p></div>
+          <div class="challenge-card solution"><span class="ch-label">Solution</span><h4>Positional Spawn Logic</h4><p>Refined spawn logic so enemies always appear ahead of or alongside the player with no lull periods at any depth.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="full-section fade-up">
+      <div class="section-label">Results</div>
+      <h2 class="block-title">What I Delivered</h2>
+      <p class="prose" style="max-width:780px; margin-bottom:0;">In two weeks as a solo developer, Cyber Siege went from concept to a <strong>fully playable, APK-deployed VR shooter on Meta Quest</strong>. Every system — movement, shooting, AI, procedural generation, scoring, and UI — was designed, built, and optimized by hand.</p>
+      <div class="outcomes-bar">
+        <div class="outcome-stat"><div class="num">1</div><div class="desc">Solo developer,<br>all systems</div></div>
+        <div class="outcome-stat"><div class="num">2</div><div class="desc">Weeks from<br>concept to APK</div></div>
+        <div class="outcome-stat"><div class="num">2</div><div class="desc">Enemy types with<br>distinct behaviors</div></div>
+        <div class="outcome-stat"><div class="num">∞</div><div class="desc">Procedurally<br>generated tunnel</div></div>
+      </div>
+    </div>
+
+    <!-- NEXT STEPS -->
+    <div class="full-section fade-up">
+      <div class="section-label">Next Steps</div>
+      <h2 class="block-title">Where It Could Go</h2>
+      <div class="next-list">
+        <div class="next-item"><span class="bullet">▸</span><p>Boss encounters at milestone depths for replayability and a sense of progression</p></div>
+        <div class="next-item"><span class="bullet">▸</span><p>Player weapon variety and additional VR interaction improvements</p></div>
+        <div class="next-item"><span class="bullet">▸</span><p>Enhanced visual polish — improved lighting, VFX, and spatial audio design</p></div>
+        <div class="next-item"><span class="bullet">▸</span><p>Power-ups, upgrades, and a player progression system between runs</p></div>
+        <div class="next-item"><span class="bullet">▸</span><p>Refined onboarding tutorial, clearer pacing, and structured level progression</p></div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-block fade-up">
+      <h3>Try It Yourself</h3>
+      <p>Sideload the APK onto any Meta Quest device and experience the tunnel firsthand.</p>
+      <div class="cta-btns">
+        <a href="https://github.com/Jkr81/Cyber-Siege-Documentation/releases/latest/download/CyberSiege.apk" download class="btn-primary">Download APK ↗</a>
+        <a href="index.html" class="btn-outline">← Back to Portfolio</a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- LIGHTBOX -->
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" onclick="closeLightbox()">✕ CLOSE</button>
+    <div class="lightbox-img-wrap">
+      <img id="lightbox-img" src="" alt="">
+    </div>
+    <div class="lightbox-nav">
+      <button class="lightbox-btn" id="lb-prev" onclick="lightboxNav(-1)">←</button>
+      <span class="lightbox-counter" id="lb-counter">1 / 6</span>
+      <button class="lightbox-btn" id="lb-next" onclick="lightboxNav(1)">→</button>
+    </div>
+  </div>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+    }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+    // Lightbox with navigation
+    let lbSlots = [];
+    let lbIndex = 0;
+
+    function openLightbox(slot) {
+      lbSlots = Array.from(document.querySelectorAll('.screenshot-slot'));
+      lbIndex = lbSlots.indexOf(slot);
+      showLightboxImage();
+      document.getElementById('lightbox').classList.add('active');
+      document.addEventListener('keydown', lbKeyHandler);
+    }
+
+    function showLightboxImage() {
+      const img = lbSlots[lbIndex].querySelector('img');
+      document.getElementById('lightbox-img').src = img.src;
+      document.getElementById('lb-counter').textContent = (lbIndex + 1) + ' / ' + lbSlots.length;
+      document.getElementById('lb-prev').disabled = lbIndex === 0;
+      document.getElementById('lb-next').disabled = lbIndex === lbSlots.length - 1;
+    }
+
+    function lightboxNav(dir) {
+      lbIndex = Math.max(0, Math.min(lbSlots.length - 1, lbIndex + dir));
+      showLightboxImage();
+    }
+
+    function lbKeyHandler(e) {
+      if (e.key === 'ArrowLeft') lightboxNav(-1);
+      if (e.key === 'ArrowRight') lightboxNav(1);
+      if (e.key === 'Escape') closeLightbox();
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('active');
+      document.removeEventListener('keydown', lbKeyHandler);
+    }
+
+    document.getElementById('lightbox').addEventListener('click', function(e) {
+      if (e.target === this) closeLightbox();
+    });
+
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('open');
+      mobileMenu.classList.toggle('open');
+      document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+    });
+    document.querySelectorAll('.mobile-link').forEach(link => {
+      link.addEventListener('click', () => {
+        hamburger.classList.remove('open');
+        mobileMenu.classList.remove('open');
+        document.body.style.overflow = '';
+      });
+    });
+  </script>
+</body>
+</html>
