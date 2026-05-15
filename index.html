@@ -120,7 +120,6 @@ section:not(#home) {
 }
 #about { padding-bottom: 5rem; }
 
-/* FIX 1: Skills vertically centered */
 #skills {
   min-height: 100vh;
   display: flex;
@@ -185,6 +184,15 @@ section:not(#home) {
 .skill-card li::before { content: '▸ '; color: var(--accent); }
 /* Projects */
 .projects-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+.project-card.coming-soon { border-style: dashed; border-color: rgba(99,102,241,0.25); cursor: default; }
+.project-card.coming-soon:hover { transform: none; box-shadow: 0 0 30px rgba(99,102,241,0.1); border-color: rgba(99,102,241,0.4); }
+.coming-soon-image { width: 100%; height: 200px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, rgba(99,102,241,0.04), rgba(236,72,153,0.04)); position: relative; overflow: hidden; }
+.coming-soon-image::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(99,102,241,0.03) 10px, rgba(99,102,241,0.03) 20px); }
+.coming-soon-icon { font-size: 3rem; opacity: 0.25; }
+.coming-soon-badge { display: inline-block; padding: 0.35rem 1rem; border-radius: 20px; border: 1px dashed rgba(99,102,241,0.4); color: var(--primary-light); font-family: 'Orbitron', monospace; font-size: 0.7rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; opacity: 0.6; margin-bottom: 0.8rem; }
+.coming-soon-title { font-family: 'Orbitron', monospace; font-size: 1.1rem; color: rgba(129,140,248,0.4); margin-bottom: 0.4rem; font-weight: 700; }
+.coming-soon-type { font-family: 'Orbitron', monospace; font-size: 0.72rem; color: rgba(20,184,166,0.4); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 0.8rem; font-weight: 600; }
+.coming-soon-desc { font-family: 'Space Grotesk', sans-serif; color: rgba(148,163,184,0.4); line-height: 1.6; font-size: 0.95rem; flex-grow: 1; margin-bottom: 1.2rem; }
 .project-card { background: var(--card-bg); backdrop-filter: blur(20px); border: 1px solid rgba(99,102,241,0.15); border-radius: 20px; overflow: hidden; transition: all 0.4s ease; position: relative; display: flex; flex-direction: column; height: 100%; }
 .project-card:hover { transform: translateY(-10px); border-color: rgba(99,102,241,0.4); box-shadow: 0 20px 50px rgba(99,102,241,0.2); }
 .project-image { width: 100%; height: 200px; overflow: hidden; position: relative; background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(236,72,153,0.08)); }
@@ -277,6 +285,8 @@ footer { background: var(--darker-bg); border-top: 1px solid rgba(99,102,241,0.1
     <span></span><span></span><span></span>
   </div>
 </nav>
+
+<!-- ─── HOME ─── -->
 <section id="home">
   <div class="container">
     <div class="home-content">
@@ -286,6 +296,7 @@ footer { background: var(--darker-bg); border-top: 1px solid rgba(99,102,241,0.1
     </div>
   </div>
 </section>
+
 <div class="section-divider">
   <div class="div-inner">
     <div class="div-line"></div>
@@ -293,10 +304,14 @@ footer { background: var(--darker-bg); border-top: 1px solid rgba(99,102,241,0.1
     <div class="div-line right"></div>
   </div>
 </div>
+
+<!-- ─── PROJECTS ─── -->
 <section id="projects">
   <div class="container">
     <h2 class="section-title">Featured Projects</h2>
     <div class="projects-grid">
+
+      <!-- Black Friday -->
       <div class="project-card">
         <div class="project-image"><img src="black.jpg" alt="Black Friday game screenshot"></div>
         <div class="project-content">
@@ -312,6 +327,8 @@ footer { background: var(--darker-bg); border-top: 1px solid rgba(99,102,241,0.1
           </div>
         </div>
       </div>
+
+      <!-- Crash Loop -->
       <div class="project-card">
         <div class="project-image"><img src="rose.jpg" alt="Crash Loop XR experience"></div>
         <div class="project-content">
@@ -327,6 +344,8 @@ footer { background: var(--darker-bg); border-top: 1px solid rgba(99,102,241,0.1
           </div>
         </div>
       </div>
+
+      <!-- GreenU Redesign -->
       <div class="project-card">
         <div class="project-image"><img src="centennial.jpg" alt="GreenU Redesign"></div>
         <div class="project-content">
@@ -342,9 +361,63 @@ footer { background: var(--darker-bg); border-top: 1px solid rgba(99,102,241,0.1
           </div>
         </div>
       </div>
+
+      <!-- Cyber Siege -->
+      <div class="project-card">
+        <div class="project-image"><img src="ship.jpg" alt="Cyber Siege VR space shooter"></div>
+        <div class="project-content">
+          <div class="project-type">VR Space Shooter</div>
+          <h3>Cyber Siege</h3>
+          <p class="project-description">A first-person VR space shooter where players pilot a spacecraft through a procedurally generated asteroid tunnel, battling waves of android enemies designed for the Meta Quest.</p>
+          <div class="project-tags">
+            <span class="project-tag">Unity</span><span class="project-tag">C#</span><span class="project-tag">Meta Quest</span><span class="project-tag">XR Interaction</span>
+          </div>
+          <div class="project-links">
+            <a href="cybersiege-case-study.html" class="project-link">Case Study ↗</a>
+            <a href="https://jkr81.github.io/Cyber-Siege-Documentation/" target="_blank" rel="noopener noreferrer" class="project-link secondary">Website ↗</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Eyes on the Road -->
+      <div class="project-card">
+        <div class="project-image"><img src="Start.png" alt="Eyes on the Road traffic simulation game"></div>
+        <div class="project-content">
+          <div class="project-type">Traffic Simulation Game</div>
+          <h3>Eyes on the Road</h3>
+          <p class="project-description">A traffic management simulation where players draw paths to guide pedestrians safely across intersections while avoiding collisions, managing time, and keeping their score alive under pressure.</p>
+          <div class="project-tags">
+            <span class="project-tag">Unity</span><span class="project-tag">C#</span><span class="project-tag">Simulation</span><span class="project-tag">Game Design</span>
+          </div>
+          <div class="project-links">
+            <a href="eyesontheroad-case-study.html" class="project-link">Case Study ↗</a>
+            <a href="https://jkr81.itch.io/eyes-on-the-road" target="_blank" rel="noopener noreferrer" class="project-link secondary">Play ↗</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coming Soon -->
+      <div class="project-card coming-soon">
+        <div class="coming-soon-image">
+          <div class="coming-soon-icon">🔒</div>
+        </div>
+        <div class="project-content">
+          <div class="coming-soon-type">Next Project</div>
+          <h3 class="coming-soon-title">Coming Soon</h3>
+          <p class="coming-soon-desc">Something new is in the works. Stay tuned for the next project — currently in development.</p>
+          <div class="project-tags">
+            <span class="project-tag" style="opacity:0.35;">TBD</span>
+          </div>
+          <div class="project-links">
+            <span class="project-link" style="opacity:0.3;cursor:default;pointer-events:none;">In Development</span>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
+
 <div class="section-divider">
   <div class="div-inner">
     <div class="div-line"></div>
@@ -352,6 +425,8 @@ footer { background: var(--darker-bg); border-top: 1px solid rgba(99,102,241,0.1
     <div class="div-line right"></div>
   </div>
 </div>
+
+<!-- ─── SKILLS ─── -->
 <section id="skills">
   <div class="container">
     <h2 class="section-title">Skills</h2>
@@ -379,6 +454,7 @@ footer { background: var(--darker-bg); border-top: 1px solid rgba(99,102,241,0.1
     </div>
   </div>
 </section>
+
 <div class="section-divider">
   <div class="div-inner">
     <div class="div-line"></div>
@@ -386,6 +462,8 @@ footer { background: var(--darker-bg); border-top: 1px solid rgba(99,102,241,0.1
     <div class="div-line right"></div>
   </div>
 </div>
+
+<!-- ─── ABOUT ─── -->
 <section id="about">
   <div class="container">
     <h2 class="section-title">About Me</h2>
@@ -401,6 +479,7 @@ footer { background: var(--darker-bg); border-top: 1px solid rgba(99,102,241,0.1
     </div>
   </div>
 </section>
+
 <div class="section-divider">
   <div class="div-inner">
     <div class="div-line"></div>
@@ -408,6 +487,8 @@ footer { background: var(--darker-bg); border-top: 1px solid rgba(99,102,241,0.1
     <div class="div-line right"></div>
   </div>
 </div>
+
+<!-- ─── CONNECT ─── -->
 <section id="connect">
   <div class="container">
     <h2 class="section-title">Let's Connect</h2>
@@ -424,14 +505,15 @@ footer { background: var(--darker-bg); border-top: 1px solid rgba(99,102,241,0.1
     </div>
   </div>
 </section>
+
 <footer>
   <div class="footer-bottom">
     <p>&copy; 2026 Josh Rocha.</p>
     <a href="#home" class="back-to-top">Back to Top</a>
   </div>
 </footer>
+
 <script>
-/* FIX 2: Prevent browser from restoring scroll position on reload */
 if ('scrollRestoration' in history) {
   history.scrollRestoration = 'manual';
 }
