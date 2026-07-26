@@ -197,6 +197,7 @@ h2.block-title { font-family: 'Orbitron', monospace; font-size: 1.8rem; font-wei
 <div class="scanlines"></div>
 <div class="mobile-menu" id="mobileMenu">
   <a href="index.html#projects" class="mobile-link">Projects</a>
+  <a href="index.html#experience" class="mobile-link">Experience</a>
   <a href="index.html#skills" class="mobile-link">Skills</a>
   <a href="index.html#about" class="mobile-link">About</a>
   <a href="Resume.pdf" target="_blank" rel="noopener noreferrer" class="mobile-link">Resume ↗</a>
@@ -220,6 +221,7 @@ h2.block-title { font-family: 'Orbitron', monospace; font-size: 1.8rem; font-wei
   </a>
   <ul class="nav-links">
     <li><a href="index.html#projects">Projects</a></li>
+    <li><a href="index.html#experience">Experience</a></li>
     <li><a href="index.html#skills">Skills</a></li>
     <li><a href="index.html#about">About</a></li>
     <li><a href="Resume.pdf" target="_blank" rel="noopener noreferrer">Resume ↗</a></li>
@@ -289,7 +291,6 @@ h2.block-title { font-family: 'Orbitron', monospace; font-size: 1.8rem; font-wei
     </div>
   </div>
 
-  <!-- VIDEO SHOWCASE — gif-wrapper contains ONLY video + overlay; gif-info is OUTSIDE the wrapper -->
   <div class="full-section fade-up">
     <div class="section-label">See It In Action</div>
     <h2 class="block-title">Gameplay Showcase</h2>
@@ -459,7 +460,6 @@ h2.block-title { font-family: 'Orbitron', monospace; font-size: 1.8rem; font-wei
   }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
   document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 
-  // Hover-to-play (desktop) / tap-to-toggle (mobile)
   const isTouch = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 
   if (isTouch) {
