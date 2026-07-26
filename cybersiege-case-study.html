@@ -18,7 +18,6 @@
     .grid-bg { position: fixed; inset: 0; background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 50px 50px; pointer-events: none; z-index: 0; }
     .scanlines { position: fixed; inset: 0; background: repeating-linear-gradient(to bottom, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px); pointer-events: none; z-index: 0; opacity: 0.4; }
 
-    /* ─── NAV ─── */
     nav {
       position: fixed; top: 0; width: 100%;
       padding: 1.5rem 3rem;
@@ -62,7 +61,6 @@
     .mobile-menu a:hover { color: var(--indigo-light); }
     .mobile-menu .mob-connect { padding: 0.9rem 2.5rem; background: linear-gradient(135deg, var(--indigo), var(--pink)); border-radius: 50px; color: white; font-size: 1rem; }
 
-    /* ─── HERO ─── */
     .hero { position: relative; z-index: 2; padding: 9rem 3rem 4rem; max-width: 1100px; margin: 0 auto; }
     .hero-tag { display: inline-flex; align-items: center; gap: 0.5rem; font-family: 'Orbitron', monospace; font-size: 0.72rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--teal); background: rgba(20,184,166,0.08); border: 1px solid rgba(20,184,166,0.25); padding: 0.4rem 1rem; border-radius: 100px; margin-bottom: 1.8rem; }
     .hero-tag::before { content: '▸'; }
@@ -74,7 +72,6 @@
     .meta-pill .value { font-family: 'Orbitron', monospace; font-size: 0.85rem; font-weight: 700; color: var(--indigo-light); }
     .divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(99,102,241,0.3), transparent); margin: 0 3rem; position: relative; z-index: 2; }
 
-    /* ─── CONTENT ─── */
     .content { max-width: 1100px; margin: 0 auto; padding: 4rem 3rem 7rem; position: relative; z-index: 2; }
     .intro-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-bottom: 4.5rem; align-items: center; }
     .intro-grid .img-block { align-self: center; margin-top: 2.5rem; }
@@ -90,7 +87,6 @@
     .img-block img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .img-placeholder { width: 100%; aspect-ratio: 16/10; display: flex; align-items: center; justify-content: center; font-size: 5rem; background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(236,72,153,0.08)); }
 
-    /* Process steps */
     .process-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 1.5rem; margin-top: 2rem; }
     .step-card { background: var(--card); border: 1px solid rgba(99,102,241,0.15); border-radius: 16px; padding: 1.8rem; position: relative; overflow: hidden; transition: all 0.3s ease; }
     .step-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--indigo), var(--pink)); opacity: 0; transition: opacity 0.3s; }
@@ -100,7 +96,6 @@
     .step-card h4 { font-family: 'Orbitron', monospace; font-size: 0.85rem; font-weight: 700; color: var(--indigo-light); margin-bottom: 0.6rem; letter-spacing: 0.5px; text-transform: uppercase; }
     .step-card p { font-size: 0.9rem; line-height: 1.6; color: var(--muted); }
 
-    /* Mechanics grid */
     .mechanics-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 1.2rem; margin-top: 2rem; }
     .mechanic-item { background: var(--card); border: 1px solid rgba(99,102,241,0.12); border-radius: 12px; padding: 1.6rem; display: flex; align-items: center; gap: 1.2rem; transition: all 0.3s ease; }
     .mechanic-item:hover { border-color: rgba(20,184,166,0.3); background: rgba(20,184,166,0.04); }
@@ -108,11 +103,9 @@
     .mechanic-item h5 { font-family: 'Orbitron', monospace; font-size: 0.78rem; font-weight: 700; color: var(--teal); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.3rem; }
     .mechanic-item p { font-size: 0.9rem; color: var(--muted); line-height: 1.5; }
 
-    /* Video embed */
     .video-embed-wrap { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: 16px; overflow: hidden; border: 1px solid rgba(99,102,241,0.2); margin-top: 2rem; background: #000; }
     .video-embed-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; display: block; }
 
-    /* Screenshots grid */
     .screenshots-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-top: 2rem; }
     .screenshot-slot { position: relative; aspect-ratio: 16/10; border-radius: 12px; overflow: hidden; border: 1px solid rgba(99,102,241,0.15); cursor: pointer; transition: all 0.3s ease; }
     .screenshot-slot:hover { border-color: rgba(99,102,241,0.5); transform: scale(1.02); box-shadow: 0 8px 25px rgba(99,102,241,0.2); }
@@ -120,7 +113,6 @@
     .screenshot-slot:hover img { transform: scale(1.06); }
     .screenshot-num { position: absolute; bottom: 7px; right: 9px; font-family: 'Orbitron', monospace; font-size: 0.6rem; font-weight: 700; letter-spacing: 1px; color: var(--indigo-light); background: rgba(6,8,16,0.8); padding: 2px 7px; border-radius: 4px; }
 
-    /* Lightbox */
     .lightbox { display: none; position: fixed; inset: 0; background: rgba(6,8,16,0.96); z-index: 2000; align-items: center; justify-content: center; flex-direction: column; gap: 1.5rem; backdrop-filter: blur(12px); }
     .lightbox.active { display: flex; }
     .lightbox-img-wrap { position: relative; display: flex; align-items: center; justify-content: center; }
@@ -133,7 +125,6 @@
     .lightbox-btn:hover { background: rgba(99,102,241,0.25); border-color: var(--indigo-light); transform: scale(1.1); }
     .lightbox-btn:disabled { opacity: 0.2; cursor: default; transform: none; }
 
-    /* Challenges */
     .challenges-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-top: 2rem; }
     .challenge-pair { display: contents; }
     .challenge-card { background: var(--card); border: 1px solid rgba(99,102,241,0.15); padding: 1.5rem; position: relative; }
@@ -151,20 +142,17 @@
     .challenge-card h4 { font-family: 'Orbitron', monospace; font-size: 0.9rem; font-weight: 700; color: var(--text); margin-bottom: 0.6rem; }
     .challenge-card p { font-size: 0.9rem; line-height: 1.6; color: var(--muted); }
 
-    /* Outcomes */
     .outcomes-bar { background: var(--card); border: 1px solid rgba(99,102,241,0.15); border-radius: 20px; padding: 2.5rem; margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 2rem; }
     .outcome-stat { text-align: center; }
     .outcome-stat .num { font-family: 'Orbitron', monospace; font-size: 2.8rem; font-weight: 900; background: linear-gradient(135deg, var(--indigo-light), var(--teal)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; margin-bottom: 0.5rem; }
     .outcome-stat .desc { font-size: 0.85rem; color: var(--muted); line-height: 1.4; }
 
-    /* Next list */
     .next-list { display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1.5rem; }
     .next-item { display: flex; align-items: flex-start; gap: 1rem; padding: 1rem 1.3rem; background: var(--card); border: 1px solid rgba(99,102,241,0.1); border-radius: 10px; transition: all 0.3s ease; }
     .next-item:hover { border-color: rgba(99,102,241,0.3); transform: translateX(6px); }
     .next-item .bullet { color: var(--indigo-light); font-family: 'Orbitron', monospace; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; margin-top: 0.1rem; }
     .next-item p { font-size: 0.95rem; color: var(--muted); line-height: 1.5; }
 
-    /* Repo block */
     .repo-block { background: var(--card); border: 1px solid rgba(99,102,241,0.2); border-radius: 20px; padding: 2rem 2.5rem; margin-top: 2rem; display: flex; align-items: center; justify-content: space-between; gap: 2rem; flex-wrap: wrap; position: relative; overflow: hidden; transition: all 0.3s ease; }
     .repo-block::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--indigo), var(--pink), var(--teal)); }
     .repo-block:hover { border-color: rgba(99,102,241,0.4); box-shadow: 0 10px 30px rgba(99,102,241,0.15); }
@@ -178,7 +166,6 @@
     .repo-btn.teal:hover { background: var(--teal); border-color: var(--teal); color: var(--bg); }
     .repo-btns { display: flex; gap: 1rem; flex-wrap: wrap; flex-shrink: 0; }
 
-    /* CTA */
     .cta-block { margin-top: 4.5rem; text-align: center; padding: 4rem 3rem; background: var(--card); border: 1px solid rgba(99,102,241,0.2); border-radius: 24px; position: relative; overflow: hidden; }
     .cta-block::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at center, rgba(99,102,241,0.05) 0%, transparent 60%); }
     .cta-block h3 { font-family: 'Orbitron', monospace; font-size: 1.8rem; font-weight: 900; color: var(--text); margin-bottom: 1rem; position: relative; z-index: 1; }
@@ -229,6 +216,7 @@
 
   <div class="mobile-menu" id="mobileMenu">
     <a href="index.html#projects" class="mobile-link">Projects</a>
+    <a href="index.html#experience" class="mobile-link">Experience</a>
     <a href="index.html#skills" class="mobile-link">Skills</a>
     <a href="index.html#about" class="mobile-link">About</a>
     <a href="Resume.pdf" target="_blank" rel="noopener noreferrer" class="mobile-link">Resume ↗</a>
@@ -253,6 +241,7 @@
     </a>
     <ul class="nav-links">
       <li><a href="index.html#projects">Projects</a></li>
+      <li><a href="index.html#experience">Experience</a></li>
       <li><a href="index.html#skills">Skills</a></li>
       <li><a href="index.html#about">About</a></li>
       <li><a href="Resume.pdf" target="_blank" rel="noopener noreferrer">Resume ↗</a></li>
@@ -263,7 +252,6 @@
     </div>
   </nav>
 
-  <!-- ─── HERO ─── -->
   <section class="hero">
     <div class="hero-tag">Case Study · VR Space Shooter</div>
     <h1>CYBER<br>SIEGE</h1>
@@ -282,7 +270,6 @@
 
   <div class="content">
 
-    <!-- OVERVIEW -->
     <div class="intro-grid fade-up">
       <div>
         <div class="section-label">The Concept</div>
@@ -297,7 +284,6 @@
       </div>
     </div>
 
-    <!-- DESIGN PROCESS -->
     <div class="full-section fade-up">
       <div class="section-label">Design Process</div>
       <h2 class="block-title">How I Built It</h2>
@@ -309,7 +295,6 @@
       </div>
     </div>
 
-    <!-- CORE MECHANICS -->
     <div class="full-section fade-up">
       <div class="section-label">Systems Design</div>
       <h2 class="block-title">Core Mechanics</h2>
@@ -323,7 +308,6 @@
       </div>
     </div>
 
-    <!-- MEDIA -->
     <div class="full-section fade-up">
       <div class="section-label">Gameplay Footage</div>
       <h2 class="block-title">See It In Action</h2>
@@ -332,7 +316,6 @@
       </div>
     </div>
 
-    <!-- SCREENSHOTS -->
     <div class="full-section fade-up">
       <div class="section-label">Screenshots</div>
       <h2 class="block-title">Game Gallery</h2>
@@ -346,7 +329,6 @@
       </div>
     </div>
 
-    <!-- MY CONTRIBUTIONS -->
     <div class="full-section fade-up">
       <div class="section-label">My Contributions</div>
       <h2 class="block-title">What I Built</h2>
@@ -360,7 +342,6 @@
       </div>
     </div>
 
-    <!-- SOURCE CODE -->
     <div class="full-section fade-up">
       <div class="section-label">Source Code & Download</div>
       <h2 class="block-title">Access the Project</h2>
@@ -379,7 +360,6 @@
       </div>
     </div>
 
-    <!-- CHALLENGES -->
     <div class="full-section fade-up">
       <div class="section-label">Challenges & Solutions</div>
       <h2 class="block-title">What I Overcame</h2>
@@ -403,7 +383,6 @@
       </div>
     </div>
 
-    <!-- RESULTS -->
     <div class="full-section fade-up">
       <div class="section-label">Results</div>
       <h2 class="block-title">What I Delivered</h2>
@@ -416,7 +395,6 @@
       </div>
     </div>
 
-    <!-- NEXT STEPS -->
     <div class="full-section fade-up">
       <div class="section-label">Next Steps</div>
       <h2 class="block-title">Where It Could Go</h2>
@@ -429,7 +407,6 @@
       </div>
     </div>
 
-    <!-- CTA -->
     <div class="cta-block fade-up">
       <h3>Try It Yourself</h3>
       <p>Sideload the APK onto any Meta Quest device and experience the tunnel firsthand.</p>
@@ -441,7 +418,6 @@
 
   </div>
 
-  <!-- LIGHTBOX -->
   <div class="lightbox" id="lightbox">
     <button class="lightbox-close" onclick="closeLightbox()">✕ CLOSE</button>
     <div class="lightbox-img-wrap">
@@ -460,7 +436,6 @@
     }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
     document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 
-    // Lightbox with navigation
     let lbSlots = [];
     let lbIndex = 0;
 
