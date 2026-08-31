@@ -242,6 +242,8 @@ section:not(#home) {
 .experience-dates { font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; color: var(--dim); white-space: nowrap; }
 .experience-company { font-family: 'Space Grotesk', sans-serif; font-size: 1.02rem; color: var(--text-secondary); margin-bottom: 1.4rem; }
 .experience-company strong { color: var(--text-primary); font-weight: 600; }
+.experience-company .vesl-link { display: inline-block; transition: all 0.3s ease; }
+.experience-company .vesl-link:hover { color: var(--accent); transform: translate(2px, -2px) scale(1.15); text-shadow: 0 0 10px rgba(20,184,166,0.6); }
 .experience-desc { font-family: 'Space Grotesk', sans-serif; color: var(--text-secondary); line-height: 1.8; font-size: 1rem; margin-bottom: 1.6rem; }
 .experience-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 /* Connect */
@@ -479,7 +481,7 @@ footer { background: var(--darker-bg); border-top: 1px solid rgba(99,102,241,0.1
               <span class="experience-role">Software Developer</span>
               <span class="experience-dates">May 2026 — Present · Hybrid</span>
             </div>
-            <div class="experience-company">The <strong>VESL</strong> (Virtual Experiences Simulation Lab)</div>
+            <div class="experience-company">The <strong>VESL</strong> (Virtual Experiences Simulation Lab) <a href="https://xr.miami.edu/labs/the-vesl/index.html" target="_blank" rel="noopener noreferrer" class="vesl-link" style="color: var(--accent-light); font-weight: 700; font-size: 1.15em; margin-left: 0.15rem;">↗</a></div>
           </div>
         </div>
         <p class="experience-desc">Designer and developer for immersive XR simulations in Unity, contributing to VESL's work in simulation-based learning and XR interface design within the University of Miami's Institute for Data Science and Computing.</p>
